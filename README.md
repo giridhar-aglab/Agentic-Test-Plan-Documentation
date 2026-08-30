@@ -3,12 +3,12 @@
 A multi-agent system in Go that reads a repository and produces a test planning
 document. Architecture doc: `claude/architecture.md` in the project.
 
-**Status: all seven phases implemented. 102 tests, `go vet` clean, zero dependencies.**
+**Status: all seven phases implemented. 116 tests, `go vet` clean, zero dependencies.**
 
 ## Run it
 
 ```bash
-go test ./...                                                     # 102 tests
+go test ./...                                                     # 116 tests
 
 # Local directory, no API key — every phase runs with deterministic fallbacks
 go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
@@ -16,11 +16,14 @@ go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
 # With a model
 ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan -source /path/to/repo -out plan.md
 
-# GitHub over MCP
-ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan \
-  -github owner/repo -ref main \
-  -mcp-command "npx -y @modelcontextprotocol/server-github" \
-  -link-base https://github.com/owner/repo/blob/main -out plan.md
+# GitHub — paste any repo URL
+export ANTHROPIC_API_KEY=sk-...
+export GITHUB_TOKEN=ghp_...                                   # private repos
+export GITHUB_MCP_COMMAND="npx -y @modelcontextprotocol/server-github"
+go run ./cmd/testplan -github https://github.com/owner/repo -out plan.md
+
+# A branch in the URL is honoured; -ref overrides it
+go run ./cmd/testplan -github https://github.com/owner/repo/tree/feature-x
 
 # As an MCP server
 go run ./cmd/testplan-mcp        # speaks JSON-RPC on stdio

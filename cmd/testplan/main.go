@@ -36,9 +36,12 @@ func main() {
 
 func run() error {
 	sourceDirectory := flag.String("source", ".", "local directory to analyse")
-	githubRepository := flag.String("github", "", "analyse owner/repo through the GitHub MCP server instead of a local directory")
-	githubRef := flag.String("ref", "", "branch, tag or commit for -github (default: the default branch)")
-	mcpCommand := flag.String("mcp-command", "", "command that starts the GitHub MCP server, e.g. \"npx -y @modelcontextprotocol/server-github\"")
+	githubRepository := flag.String("github", "",
+		"analyse a GitHub repository: a full URL, an SSH remote, or owner/repo")
+	githubRef := flag.String("ref", "",
+		"branch, tag or commit for -github (overrides a branch found in the URL; default: the default branch)")
+	mcpCommand := flag.String("mcp-command", defaultMCPCommand(),
+		"command that starts the GitHub MCP server (or set GITHUB_MCP_COMMAND)")
 	repositoryName := flag.String("name", "", "repository name for the report")
 	outputPath := flag.String("out", "", "write the report here instead of stdout")
 	checkpointDirectory := flag.String("checkpoints", "", "directory for per-phase blackboard checkpoints")
@@ -66,6 +69,18 @@ func run() error {
 	}
 	defer closeSource()
 
+	// Source links make a scenario checkable in one click. For a GitHub run the
+	// base is derivable, so not asking for it is one less flag to get wrong.
+	resolvedLinkBase := *sourceLinkBase
+	if resolvedLinkBase == "" && *githubRepository != "" {
+		if reference, parseErr := mcpx.ParseRepositoryReference(*githubRepository); parseErr == nil {
+			if *githubRef != "" {
+				reference.Ref = *githubRef
+			}
+			resolvedLinkBase = reference.SourceLinkBase()
+		}
+	}
+
 	provider := buildProvider(logf)
 
 	runID := fmt.Sprintf("run-%d", time.Now().UTC().Unix())
@@ -90,7 +105,7 @@ func run() error {
 
 	validationReport := approval.Validate(blackboard)
 	reportMarkdown := render.PlanMarkdown(blackboard, render.Options{
-		SourceLinkBase: *sourceLinkBase,
+		SourceLinkBase: resolvedLinkBase,
 		Validation:     &validationReport,
 	})
 
@@ -141,12 +156,20 @@ func buildSource(
 			currentCommitSHA(absoluteSource), noop, nil
 	}
 
-	owner, repositorySlug, found := strings.Cut(githubRepository, "/")
-	if !found || owner == "" || repositorySlug == "" {
-		return nil, "", "", noop, fmt.Errorf("-github must be owner/repo, got %q", githubRepository)
+	reference, err := mcpx.ParseRepositoryReference(githubRepository)
+	if err != nil {
+		return nil, "", "", noop, fmt.Errorf("-github: %w", err)
+	}
+	// An explicit -ref wins over a branch carried in the URL, so a pasted link
+	// can still be redirected without editing it.
+	if githubRef != "" {
+		reference.Ref = githubRef
 	}
 	if mcpCommand == "" {
-		return nil, "", "", noop, errors.New("-github requires -mcp-command naming the GitHub MCP server to start")
+		return nil, "", "", noop, errors.New(
+			"-github needs a GitHub MCP server to talk to. Set -mcp-command or GITHUB_MCP_COMMAND, " +
+				"for example: -mcp-command \"npx -y @modelcontextprotocol/server-github\". " +
+				"The server reads GITHUB_TOKEN for private repositories")
 	}
 
 	commandFields := strings.Fields(mcpCommand)
@@ -165,11 +188,15 @@ func buildSource(
 
 	displayName := repositoryName
 	if displayName == "" {
-		displayName = githubRepository
+		displayName = reference.Slug()
 	}
-	githubSource := mcpx.NewGitHubSource(client, owner, repositorySlug, githubRef, maxFiles)
-	return githubSource, displayName, githubRef, func() { _ = client.Close() }, nil
+	githubSource := mcpx.NewGitHubSource(client, reference.Owner, reference.Repository, reference.Ref, maxFiles)
+	return githubSource, displayName, reference.Ref, func() { _ = client.Close() }, nil
 }
+
+// defaultMCPCommand lets the server be configured once in the environment
+// rather than repeated on every invocation.
+func defaultMCPCommand() string { return os.Getenv("GITHUB_MCP_COMMAND") }
 
 // buildProvider returns nil when no credentials are configured. A nil provider
 // is a supported mode, not an error: the pipeline runs every phase with its
