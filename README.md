@@ -3,81 +3,113 @@
 A multi-agent system in Go that reads a repository and produces a test planning
 document. Architecture doc: `claude/architecture.md` in the project.
 
-**Status: slice 1 of the build — the runtime core and the Surveyor.**
-
-Everything in this slice runs with no API key, no network and no MCP server, and
-the whole control layer is exercised by tests. That is deliberate: the control
-layer is where five of the six client requirements actually live, so it is the
-part that has to be right before anything else is worth writing.
+**Status: all seven phases implemented. 102 tests, `go vet` clean, zero dependencies.**
 
 ## Run it
 
 ```bash
-go test ./...                                         # 48 tests, all green
+go test ./...                                                     # 102 tests
+
+# Local directory, no API key — every phase runs with deterministic fallbacks
 go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
+
+# With a model
+ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan -source /path/to/repo -out plan.md
+
+# GitHub over MCP
+ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan \
+  -github owner/repo -ref main \
+  -mcp-command "npx -y @modelcontextprotocol/server-github" \
+  -link-base https://github.com/owner/repo/blob/main -out plan.md
+
+# As an MCP server
+go run ./cmd/testplan-mcp        # speaks JSON-RPC on stdio
 ```
 
-Flags: `-source`, `-name`, `-out`, `-checkpoints`, `-max-files` (default 400), `-v`.
+## The seven phases
 
-## What is built
+| # | Phase | What it does | Model |
+|---|---|---|---|
+| 1 | survey | Repo map, manifests, existing tests, entrypoints | Optional |
+| 2 | analyse | Per-component behaviour and error paths, N-way parallel | Yes |
+| 3 | risk | Prioritised register from complexity, failure paths, coverage | **No** |
+| 4 | author | Scenarios per prioritised risk, ⇄ critic, ≤2 rounds | Yes |
+| 5 | validate | Structural checks before a human reads anything | **No** |
+| 6 | — | (render is part of the composer, not a phase) | **No** |
+| 7 | approval | Hard stop. Nothing publishes until a person says yes | **No** |
 
-| Package | What it does |
-|---|---|
-| `internal/model` | The typed values agents exchange. No agent ever passes another a transcript. |
-| `internal/llm` | Provider abstraction + a scriptable fake. Agents ask for a *tier*, never a model name. |
-| `internal/tool` | The one `Tool` interface, the scoped registry, and the policy layer: timeouts, retry with jitter, circuit breaker, fallback chains. |
-| `internal/tool/repo` | Repository access behind a `Source` seam. Local directory now; the GitHub MCP client drops in behind it. |
-| `internal/tool/code` | `go/ast` analysis: symbols, signatures, error returns, branch complexity. |
-| `internal/memory` | Blackboard (typed run state, checkpointed), working set (compaction), spill store (handles + digests). |
-| `internal/guard` | Budget, repeat-call, no-progress, scope. |
-| `internal/agent` | The bounded iteration loop, and the Surveyor. |
-| `internal/orchestrator` | Phase DAG with postconditions, budgets, checkpointing. |
-| `internal/render` | Deterministic Markdown. Same blackboard, same bytes, every time. |
+Four of the seven use no model at all. That is deliberate — see below.
 
 ## Where each requirement lives
 
 | Requirement | Code | Tests that prove it |
 |---|---|---|
-| Multi-agent architecture | `orchestrator/`, `agent/` | `TestPhasesRunInDependencyOrder`, `TestDependentPhaseIsSkippedNotRun` |
-| MCP service integration | `tool/repo.Source` seam | *(slice 2)* |
-| Internal and external tool calls | `tool.Tool` + `Registry` | `TestScopedRegistryRefusesUnknownTool` |
-| Agent loop avoidance | `guard/`, `orchestrator.topologicalOrder` | `TestRepeatCallGuardGraduates…`, `TestCyclicPipelineIsRefused`, `TestLoopStopsOnIterationBudget` |
+| Multi-agent architecture | `orchestrator/`, `agent/`, `pipeline/` | `TestPhasesRunInDependencyOrder`, `TestPipelineRunsEveryPhaseWithoutAProvider` |
+| MCP service integration | `mcpx/` — client, GitHub source, and server | `TestEveryRequestCarriesProtocolMetaOnTheWire`, `TestRemoteToolIsIndistinguishableFromALocalTool` |
+| Internal and external tool calls | `tool.Tool` + scoped `Registry` | `TestScopedRegistryRefusesUnknownTool`, `TestRemoteToolIsIndistinguishable…` |
+| Agent loop avoidance | `guard/`, `orchestrator.topologicalOrder`, `RevisionCycle` | `TestRepeatCallGuardGraduates…`, `TestCyclicPipelineIsRefused`, `TestLoopStopsOnIterationBudget` |
 | Long-term and short-term memory | `memory/` | `TestWorkingSetCompacts…`, `TestBlackboardCheckpointRoundTrips` |
-| Tool call failure handling | `tool/policy.go`, `agent/loop.go` | `TestNonIdempotentToolIsNeverRetried`, `TestBreakerOpensAndHidesToolFromModel`, `TestLoopFeedsCorrectableErrorBackToModel` |
+| Tool call failure handling | `tool/policy.go`, `agent/loop.go`, `mcpx.classifyTransportError` | `TestNonIdempotentToolIsNeverRetried`, `TestBreakerOpensAndHidesToolFromModel`, `TestLoopFeedsCorrectableErrorBackToModel` |
 
-## Four decisions worth knowing before you read the code
+## Six decisions worth knowing before you read the code
 
 **Findings live in structs, not in the conversation.** Agents write typed values
-to the blackboard. A sub-agent starts with a fresh minimal context holding its
-task and the blackboard slices it needs. This bounds context growth, makes every
-handoff testable with ordinary `go test`, and removes the transcript
-accumulation that causes runaway agent cost.
+to a blackboard; a sub-agent starts with a fresh context holding only its task
+and the slices it needs. This is what lets the Analyst fan out across goroutines,
+and it is why every handoff is testable with ordinary `go test`.
+
+**Structured output is a tool call.** `analysis.emit_component`, `scenario.emit`
+and `review.emit` are schema-constrained, so malformed output becomes a
+correctable tool error the model can fix — and every emission moves the
+blackboard revision counter, which is how the no-progress guard measures real
+work rather than token spend.
+
+**The model is never asked for a fact that can be computed.** The AST supplies
+symbols, signatures, branch counts and third-party imports; the model supplies
+only responsibility, error paths and side effects, which are then *unioned* with
+what the parser already found. It cannot get the computable part wrong because
+it is never asked.
+
+**Risk scoring uses no model.** If a re-run silently reshuffled which components
+are P0, the plan could not be diffed and a reviewer could not tell a real change
+from sampling noise. The weights are exported and printed in the report, so a
+reviewer who disagrees can point at a number.
 
 **A transport failure and a correctable error are different things.** A timeout
-is the runtime's problem: retry it, break the circuit, fall back — the model
-never sees it. A tool *rejecting its arguments* is the model's problem, and it
-reaches the model as readable, actionable text ("no such path `x`; call
-`repo.tree` to list valid paths"). Collapsing these two is the most common defect
-in agent implementations; `TestLoopFeedsCorrectableErrorBackToModel` and
-`TestCorrectableFailureIsNotRetriedAndDoesNotTripBreaker` pin the distinction.
+is retried, breaks a circuit, falls back — the model never sees it. A tool
+*rejecting its arguments* reaches the model as readable, actionable text. This
+holds identically for in-process tools and for MCP servers, in both directions.
 
-**The strongest loop guard is a data structure.** Phases form a DAG and agents
-cannot invoke each other, so mutual recursion is not detected — it cannot be
-constructed. `TestCyclicPipelineIsRefused` fails at wiring time, not at runtime.
-The four runtime guards catch the remaining case: a single agent spinning alone.
+**Structural defects never reach the reviewer.** `report.validate` asserts that
+every `SourceRef` resolves to a symbol that exists, every scenario has a
+checkable expected result, no two scenarios duplicate, and every P0/P1 risk has
+coverage. A reviewer's attention is the scarcest resource here and should not be
+spent catching hallucinated file paths. `TestValidationCatchesAHallucinatedSymbol`
+demonstrates the case with a deliberately lying provider.
 
-**Determinism where determinism is possible.** Classifying files, parsing
-manifests, scoring complexity and rendering the report are all model-free. A
-model would make them slower, approximate, and different on every run. The
-Surveyor calls a model for exactly one thing — a sentence describing what the
-repository is for — and the survey is complete without it.
+## Deviations from the architecture doc
+
+**The official MCP Go SDK is not vendored.** This build could not reach
+`proxy.golang.org`, so `internal/mcpx` implements specification revision
+`2026-07-28` directly over the standard library — stateless requests with
+`_meta`, `server/discover`, `tools/list` cache honouring, and the tasks
+extension. Upside: zero dependencies. Downside: it tracks only the subset of the
+spec this system uses, and swapping in the real SDK later is a rewrite of one
+package. Verified against a loopback server and by driving `cmd/testplan-mcp` as
+a real subprocess.
+
+**The Anthropic adapter has not run against the live API.** It is exercised
+against `httptest` — tool-use translation both ways, `Retry-After` honouring,
+non-retryable 4xx, retry exhaustion. The wire format is written from the
+documented Messages API shape; first contact with production may need a fix.
 
 ## Not yet built
 
-Analyst, Risk, Author, Critic, the approval gate and Jira publication; the
-GitHub MCP client and the MCP server; the Anthropic provider adapter; the
-SQLite long-term store; Python analysis.
+Jira publication and the scenario-ID → issue-key ledger (designed, not coded);
+the SQLite long-term store, so the blob-SHA analysis cache does not yet persist
+between runs; Python analysis via tree-sitter; the MRTR `input_required` flow
+for approval over MCP (the phase exists and halts, but the protocol round trip
+is not wired).
 
-The seams they attach to already exist: `repo.Source` for GitHub, `llm.Provider`
-for the model, `orchestrator.Phase` for each new agent, and `tool.Tool` for
-everything either of them needs.
+Of these, the **analysis cache is the highest-value next piece** — it is the
+largest cost lever in the system and the seam for it already exists.

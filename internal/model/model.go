@@ -289,3 +289,29 @@ func (provenance Provenance) String() string {
 	}
 	return string(provenance.Kind) + ":" + provenance.Server
 }
+
+// ReviewSeverity orders the Critic's findings.
+type ReviewSeverity string
+
+const (
+	ReviewBlocking ReviewSeverity = "blocking"
+	ReviewMajor    ReviewSeverity = "major"
+	ReviewMinor    ReviewSeverity = "minor"
+)
+
+// RevisionRequest is one Critic finding. The Author gets these back, and the
+// bounded revision cycle requires the count to strictly decrease each round —
+// so a critic that keeps finding the same thing ends the loop rather than
+// extending it.
+type RevisionRequest struct {
+	ScenarioID string         `json:"scenarioId,omitempty"`
+	RiskRef    string         `json:"riskRef,omitempty"`
+	Severity   ReviewSeverity `json:"severity"`
+	Issue      string         `json:"issue"`
+	Suggestion string         `json:"suggestion,omitempty"`
+}
+
+// Blocking reports whether this finding must be addressed before review.
+func (revisionRequest RevisionRequest) Blocking() bool {
+	return revisionRequest.Severity == ReviewBlocking
+}

@@ -32,13 +32,14 @@ type Blackboard struct {
 	RunID     string    `json:"runId"`
 	StartedAt time.Time `json:"startedAt"`
 
-	repoMap         *model.RepoMap
-	componentModels []model.ComponentModel
-	riskRegister    *model.RiskRegister
-	testScenarios   []model.TestScenario
-	verdicts        []model.Verdict
-	gaps            []Gap
-	degradedTools   map[string]string
+	repoMap          *model.RepoMap
+	componentModels  []model.ComponentModel
+	riskRegister     *model.RiskRegister
+	testScenarios    []model.TestScenario
+	revisionRequests []model.RevisionRequest
+	verdicts         []model.Verdict
+	gaps             []Gap
+	degradedTools    map[string]string
 
 	// revision counts every mutation. The no-progress guard reads it, which is
 	// why "did anything happen this iteration" is a cheap integer comparison
@@ -156,6 +157,25 @@ func (blackboard *Blackboard) Scenarios() []model.TestScenario {
 	return scenariosCopy
 }
 
+// SetRevisionRequests replaces the Critic's findings for the current round.
+// Replacing rather than appending is what makes "the issue count must strictly
+// decrease" a meaningful bound on the revision cycle.
+func (blackboard *Blackboard) SetRevisionRequests(revisionRequests []model.RevisionRequest) {
+	blackboard.mutex.Lock()
+	defer blackboard.mutex.Unlock()
+	blackboard.revisionRequests = revisionRequests
+	blackboard.bumpRevision()
+}
+
+// RevisionRequests returns a copy of the Critic's current findings.
+func (blackboard *Blackboard) RevisionRequests() []model.RevisionRequest {
+	blackboard.mutex.RLock()
+	defer blackboard.mutex.RUnlock()
+	requestsCopy := make([]model.RevisionRequest, len(blackboard.revisionRequests))
+	copy(requestsCopy, blackboard.revisionRequests)
+	return requestsCopy
+}
+
 // AddVerdicts records approval-gate decisions.
 func (blackboard *Blackboard) AddVerdicts(verdicts ...model.Verdict) {
 	blackboard.mutex.Lock()
@@ -213,16 +233,17 @@ func (blackboard *Blackboard) DegradedTools() map[string]string {
 
 // snapshot is the serialisable form used for checkpoints.
 type snapshot struct {
-	RunID           string                 `json:"runId"`
-	StartedAt       time.Time              `json:"startedAt"`
-	Revision        int                    `json:"revision"`
-	RepoMap         *model.RepoMap         `json:"repoMap,omitempty"`
-	ComponentModels []model.ComponentModel `json:"componentModels,omitempty"`
-	RiskRegister    *model.RiskRegister    `json:"riskRegister,omitempty"`
-	TestScenarios   []model.TestScenario   `json:"testScenarios,omitempty"`
-	Verdicts        []model.Verdict        `json:"verdicts,omitempty"`
-	Gaps            []Gap                  `json:"gaps,omitempty"`
-	DegradedTools   map[string]string      `json:"degradedTools,omitempty"`
+	RunID            string                  `json:"runId"`
+	StartedAt        time.Time               `json:"startedAt"`
+	Revision         int                     `json:"revision"`
+	RepoMap          *model.RepoMap          `json:"repoMap,omitempty"`
+	ComponentModels  []model.ComponentModel  `json:"componentModels,omitempty"`
+	RiskRegister     *model.RiskRegister     `json:"riskRegister,omitempty"`
+	TestScenarios    []model.TestScenario    `json:"testScenarios,omitempty"`
+	RevisionRequests []model.RevisionRequest `json:"revisionRequests,omitempty"`
+	Verdicts         []model.Verdict         `json:"verdicts,omitempty"`
+	Gaps             []Gap                   `json:"gaps,omitempty"`
+	DegradedTools    map[string]string       `json:"degradedTools,omitempty"`
 }
 
 // Checkpoint serialises the blackboard. Written after every phase, so a crash
@@ -234,7 +255,7 @@ func (blackboard *Blackboard) Checkpoint() ([]byte, error) {
 		RunID: blackboard.RunID, StartedAt: blackboard.StartedAt, Revision: blackboard.revision,
 		RepoMap: blackboard.repoMap, ComponentModels: blackboard.componentModels,
 		RiskRegister: blackboard.riskRegister, TestScenarios: blackboard.testScenarios,
-		Verdicts: blackboard.verdicts, Gaps: blackboard.gaps, DegradedTools: blackboard.degradedTools,
+		RevisionRequests: blackboard.revisionRequests, Verdicts: blackboard.verdicts, Gaps: blackboard.gaps, DegradedTools: blackboard.degradedTools,
 	}, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("memory: checkpoint: %w", err)
@@ -252,7 +273,8 @@ func RestoreBlackboard(encoded []byte) (*Blackboard, error) {
 		RunID: restored.RunID, StartedAt: restored.StartedAt, revision: restored.Revision,
 		repoMap: restored.RepoMap, componentModels: restored.ComponentModels,
 		riskRegister: restored.RiskRegister, testScenarios: restored.TestScenarios,
-		verdicts: restored.Verdicts, gaps: restored.Gaps,
+		revisionRequests: restored.RevisionRequests,
+		verdicts:         restored.Verdicts, gaps: restored.Gaps,
 		degradedTools: restored.DegradedTools,
 	}
 	if blackboard.degradedTools == nil {

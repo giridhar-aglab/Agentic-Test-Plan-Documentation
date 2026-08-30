@@ -1,9 +1,7 @@
 // Command testplan runs the test-planning pipeline against a repository.
 //
-// This slice runs the survey phase against a local directory with a fake
-// provider, which is enough to exercise the whole control layer: registry,
-// policy, guards, blackboard, orchestrator and checkpointing. The GitHub MCP
-// source and the later phases drop in behind the same interfaces.
+// The source is either a local directory or a GitHub repository reached through
+// an MCP server. Both satisfy repo.Source, so nothing downstream changes.
 package main
 
 import (
@@ -14,17 +12,18 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
-	"github.com/giri-ms19/testplan-agent/internal/agent"
+	"github.com/giri-ms19/testplan-agent/internal/approval"
 	"github.com/giri-ms19/testplan-agent/internal/guard"
 	"github.com/giri-ms19/testplan-agent/internal/llm"
+	"github.com/giri-ms19/testplan-agent/internal/llm/anthropic"
+	"github.com/giri-ms19/testplan-agent/internal/mcpx"
 	"github.com/giri-ms19/testplan-agent/internal/memory"
-	"github.com/giri-ms19/testplan-agent/internal/orchestrator"
+	"github.com/giri-ms19/testplan-agent/internal/pipeline"
 	"github.com/giri-ms19/testplan-agent/internal/render"
-	"github.com/giri-ms19/testplan-agent/internal/tool"
-	"github.com/giri-ms19/testplan-agent/internal/tool/code"
 	"github.com/giri-ms19/testplan-agent/internal/tool/repo"
 )
 
@@ -36,108 +35,65 @@ func main() {
 }
 
 func run() error {
-	sourceDirectory := flag.String("source", ".", "directory to analyse")
-	repositoryName := flag.String("name", "", "repository name for the report (defaults to the directory name)")
+	sourceDirectory := flag.String("source", ".", "local directory to analyse")
+	githubRepository := flag.String("github", "", "analyse owner/repo through the GitHub MCP server instead of a local directory")
+	githubRef := flag.String("ref", "", "branch, tag or commit for -github (default: the default branch)")
+	mcpCommand := flag.String("mcp-command", "", "command that starts the GitHub MCP server, e.g. \"npx -y @modelcontextprotocol/server-github\"")
+	repositoryName := flag.String("name", "", "repository name for the report")
 	outputPath := flag.String("out", "", "write the report here instead of stdout")
 	checkpointDirectory := flag.String("checkpoints", "", "directory for per-phase blackboard checkpoints")
 	maxFiles := flag.Int("max-files", 400, "refuse repositories larger than this")
+	concurrency := flag.Int("concurrency", 4, "analyst fan-out width")
+	revisionRounds := flag.Int("revision-rounds", 2, "maximum author/critic rounds")
+	sourceLinkBase := flag.String("link-base", "", "base URL for source links, e.g. https://github.com/owner/repo/blob/main")
 	verbose := flag.Bool("v", false, "log phase progress")
 	flag.Parse()
 
-	absoluteSource, err := filepath.Abs(*sourceDirectory)
-	if err != nil {
-		return fmt.Errorf("resolve source: %w", err)
-	}
-	displayName := *repositoryName
-	if displayName == "" {
-		displayName = filepath.Base(absoluteSource)
-	}
-
-	// Ctrl-C is a clean cancellation, not a kill: the run stops at the next
-	// guard check and still emits whatever it has.
 	ctx, stopSignals := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stopSignals()
+
+	logf := func(format string, arguments ...any) {}
+	if *verbose {
+		logf = func(format string, arguments ...any) {
+			fmt.Fprintf(os.Stderr, "[%s] %s\n", time.Now().Format("15:04:05"), fmt.Sprintf(format, arguments...))
+		}
+	}
+
+	source, displayName, commitSHA, closeSource, err := buildSource(ctx,
+		*sourceDirectory, *githubRepository, *githubRef, *mcpCommand, *maxFiles, *repositoryName)
+	if err != nil {
+		return err
+	}
+	defer closeSource()
+
+	provider := buildProvider(logf)
 
 	runID := fmt.Sprintf("run-%d", time.Now().UTC().Unix())
 	blackboard := memory.NewBlackboard(runID)
 
-	source := repo.NewLocalSource(absoluteSource, *maxFiles)
-
-	fullRegistry := tool.NewRegistry()
-	fullRegistry.Register(&repo.TreeTool{Source: source}, tool.NetworkPolicy())
-	fullRegistry.Register(&repo.ReadFileTool{Source: source, MaxLines: 400}, tool.NetworkPolicy())
-	fullRegistry.Register(&code.ParseGoTool{Source: source}, tool.LocalPolicy())
-
-	// Scoped registry: the Surveyor gets exactly these three tools and nothing
-	// else. It cannot reach a renderer or a publisher, which is a loop guard as
-	// much as a safety measure.
-	surveyorRegistry, err := fullRegistry.Scoped("repo.tree", "repo.read_file", "code.parse_go")
-	if err != nil {
-		return err
-	}
-
-	repeatGuard := guard.DefaultRepeatCallGuard()
-	surveyorGuards := guard.Chain{
-		guard.NewBudgetGuard(guard.Budget{
-			MaxIterations: 12, MaxToolCalls: 40, MaxTokens: 60000, MaxWallClock: 3 * time.Minute,
-		}),
-		repeatGuard,
-		guard.NewProgressGuard(3),
-		guard.NewScopeGuard(surveyorRegistry),
-	}
-
-	// Until an adapter is wired, the fake provider stands in. The survey is
-	// deterministic without it; only the narrative sentence is lost.
-	fakeProvider := llm.NewFakeProvider()
-	fakeProvider.DefaultResponse = &llm.Response{
-		Text:       "",
-		StopReason: llm.StopEndTurn,
-	}
-
-	surveyorLoop := agent.NewLoop(fakeProvider, surveyorRegistry, blackboard, surveyorGuards)
-	surveyorLoop.RepeatGuard = repeatGuard
-
-	surveyor := &agent.Surveyor{
-		Source: source, RepositoryName: displayName, CommitSHA: currentCommitSHA(absoluteSource),
-	}
-
-	pipeline := orchestrator.New(blackboard)
-	pipeline.RunBudget = guard.Budget{MaxWallClock: 15 * time.Minute}
-	if *verbose {
-		pipeline.Logf = func(format string, arguments ...any) {
-			fmt.Fprintf(os.Stderr, "[%s] %s\n", time.Now().Format("15:04:05"), fmt.Sprintf(format, arguments...))
-		}
+	configuration := pipeline.Config{
+		Source: source, Provider: provider,
+		RepositoryName: displayName, CommitSHA: commitSHA,
+		AnalystConcurrency: *concurrency,
+		MaxRevisionRounds:  *revisionRounds,
+		RunBudget:          guard.Budget{MaxWallClock: 45 * time.Minute},
+		Logf:               logf,
 	}
 	if *checkpointDirectory != "" {
-		pipeline.Checkpoint = &fileCheckpointWriter{directory: *checkpointDirectory}
+		configuration.Checkpoint = &fileCheckpointWriter{directory: *checkpointDirectory}
 	}
 
-	pipeline.AddPhase(orchestrator.Phase{
-		Name: "survey",
-		Run: func(ctx context.Context, blackboard *memory.Blackboard) error {
-			return surveyor.Survey(ctx, blackboard)
-		},
-		Budget: guard.Budget{MaxWallClock: 3 * time.Minute},
-		// The explicit termination condition: reaching the end of Survey is not
-		// the same as having surveyed anything.
-		Postcondition: func(blackboard *memory.Blackboard) error {
-			repoMap := blackboard.RepoMap()
-			if repoMap == nil {
-				return errors.New("no repository map was produced")
-			}
-			if len(repoMap.SelectedFiles()) == 0 {
-				return errors.New("no analysable source files were selected")
-			}
-			return nil
-		},
-	})
-
-	runReport, err := pipeline.Run(ctx)
+	runReport, err := pipeline.Build(configuration, blackboard).Run(ctx)
 	if err != nil {
 		return err
 	}
 
-	reportMarkdown := render.SurveyMarkdown(blackboard)
+	validationReport := approval.Validate(blackboard)
+	reportMarkdown := render.PlanMarkdown(blackboard, render.Options{
+		SourceLinkBase: *sourceLinkBase,
+		Validation:     &validationReport,
+	})
+
 	if *outputPath != "" {
 		if err := os.WriteFile(*outputPath, []byte(reportMarkdown), 0o644); err != nil {
 			return fmt.Errorf("write report: %w", err)
@@ -148,10 +104,14 @@ func run() error {
 	}
 
 	for _, phaseResult := range runReport.PhaseResults {
-		if !phaseResult.Succeeded() {
-			fmt.Fprintf(os.Stderr, "phase %s did not succeed: %v%s\n",
-				phaseResult.Name, phaseResult.Err, phaseResult.SkipReason)
+		if phaseResult.Succeeded() {
+			continue
 		}
+		if phaseResult.Skipped {
+			fmt.Fprintf(os.Stderr, "phase %s skipped: %s\n", phaseResult.Name, phaseResult.SkipReason)
+			continue
+		}
+		fmt.Fprintf(os.Stderr, "phase %s did not succeed: %v\n", phaseResult.Name, phaseResult.Err)
 	}
 	if runReport.Aborted {
 		return errors.New(runReport.AbortReason)
@@ -159,8 +119,74 @@ func run() error {
 	return nil
 }
 
-// fileCheckpointWriter persists blackboard snapshots so a crashed run resumes
-// from the last completed phase.
+// buildSource picks between a local directory and GitHub over MCP. Both satisfy
+// repo.Source, so this function is the only place that knows the difference.
+func buildSource(
+	ctx context.Context,
+	sourceDirectory, githubRepository, githubRef, mcpCommand string,
+	maxFiles int, repositoryName string,
+) (repo.Source, string, string, func(), error) {
+	noop := func() {}
+
+	if githubRepository == "" {
+		absoluteSource, err := filepath.Abs(sourceDirectory)
+		if err != nil {
+			return nil, "", "", noop, fmt.Errorf("resolve source: %w", err)
+		}
+		displayName := repositoryName
+		if displayName == "" {
+			displayName = filepath.Base(absoluteSource)
+		}
+		return repo.NewLocalSource(absoluteSource, maxFiles), displayName,
+			currentCommitSHA(absoluteSource), noop, nil
+	}
+
+	owner, repositorySlug, found := strings.Cut(githubRepository, "/")
+	if !found || owner == "" || repositorySlug == "" {
+		return nil, "", "", noop, fmt.Errorf("-github must be owner/repo, got %q", githubRepository)
+	}
+	if mcpCommand == "" {
+		return nil, "", "", noop, errors.New("-github requires -mcp-command naming the GitHub MCP server to start")
+	}
+
+	commandFields := strings.Fields(mcpCommand)
+	transport, err := mcpx.StartCommand(ctx, commandFields[0], commandFields[1:], nil)
+	if err != nil {
+		return nil, "", "", noop, err
+	}
+	client := mcpx.NewClient("github", transport)
+
+	// Negotiate before doing anything else: under the stateless revision this
+	// is the only way to learn whether the server can talk to us at all.
+	if err := client.Discover(ctx); err != nil {
+		_ = client.Close()
+		return nil, "", "", noop, err
+	}
+
+	displayName := repositoryName
+	if displayName == "" {
+		displayName = githubRepository
+	}
+	githubSource := mcpx.NewGitHubSource(client, owner, repositorySlug, githubRef, maxFiles)
+	return githubSource, displayName, githubRef, func() { _ = client.Close() }, nil
+}
+
+// buildProvider returns nil when no credentials are configured. A nil provider
+// is a supported mode, not an error: the pipeline runs every phase with its
+// deterministic fallback and says so in the report.
+func buildProvider(logf func(format string, arguments ...any)) llm.Provider {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		logf("no ANTHROPIC_API_KEY set; running with deterministic fallbacks only")
+		return nil
+	}
+	provider := anthropic.New(apiKey)
+	if endpointOverride := os.Getenv("ANTHROPIC_BASE_URL"); endpointOverride != "" {
+		provider.Endpoint = strings.TrimSuffix(endpointOverride, "/") + "/v1/messages"
+	}
+	return provider
+}
+
 type fileCheckpointWriter struct{ directory string }
 
 func (writer *fileCheckpointWriter) Write(runID, phaseName string, snapshot []byte) error {
@@ -178,22 +204,14 @@ func currentCommitSHA(repositoryDirectory string) string {
 	if err != nil {
 		return ""
 	}
-	headText := string(headContent)
-	if len(headText) > 5 && headText[:5] == "ref: " {
-		referencePath := filepath.Join(repositoryDirectory, ".git",
-			filepath.FromSlash(trimNewline(headText[5:])))
-		referenceContent, err := os.ReadFile(referencePath)
+	headText := strings.TrimSpace(string(headContent))
+	if reference, isSymbolic := strings.CutPrefix(headText, "ref: "); isSymbolic {
+		referenceContent, err := os.ReadFile(
+			filepath.Join(repositoryDirectory, ".git", filepath.FromSlash(reference)))
 		if err != nil {
 			return ""
 		}
-		return trimNewline(string(referenceContent))
+		return strings.TrimSpace(string(referenceContent))
 	}
-	return trimNewline(headText)
-}
-
-func trimNewline(value string) string {
-	for len(value) > 0 && (value[len(value)-1] == '\n' || value[len(value)-1] == '\r') {
-		value = value[:len(value)-1]
-	}
-	return value
+	return headText
 }

@@ -131,8 +131,8 @@ func TestRenderedReportIsDeterministicAndNamesGaps(t *testing.T) {
 	blackboard, _ := surveyFixture(t)
 	blackboard.NoteGap("analyse", "internal/gateway/gateway.go", "model unavailable")
 
-	firstRender := render.SurveyMarkdown(blackboard)
-	secondRender := render.SurveyMarkdown(blackboard)
+	firstRender := render.PlanMarkdown(blackboard, render.Options{})
+	secondRender := render.PlanMarkdown(blackboard, render.Options{})
 	if firstRender != secondRender {
 		t.Fatal("the same blackboard must always render the same report, or runs cannot be diffed")
 	}
