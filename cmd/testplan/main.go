@@ -232,9 +232,13 @@ func connectToGitHub(ctx context.Context, options sourceOptions) (
 	}
 	if options.MCPCommand == "" {
 		return reference, nil, noop, errors.New(
-			"-github needs a GitHub MCP server to talk to. Set -mcp-command or GITHUB_MCP_COMMAND, " +
-				"for example: -mcp-command \"npx -y @modelcontextprotocol/server-github\". " +
-				"The server reads GITHUB_TOKEN for private repositories")
+			"-github needs a GitHub MCP server to talk to. Set -mcp-command or GITHUB_MCP_COMMAND.\n" +
+				"  GitHub's official server is a Go binary:\n" +
+				"    go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest\n" +
+				"    -mcp-command \"github-mcp-server stdio\"\n" +
+				"  or with Docker:\n" +
+				"    -mcp-command \"docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server stdio\"\n" +
+				"  Set GITHUB_PERSONAL_ACCESS_TOKEN before running; the server inherits this process's environment")
 	}
 
 	commandFields := strings.Fields(options.MCPCommand)

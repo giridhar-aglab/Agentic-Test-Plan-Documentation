@@ -17,14 +17,24 @@ go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
 ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan -source /path/to/repo -out plan.md
 
 # GitHub over MCP — no clone. This is the intended path.
-export ANTHROPIC_API_KEY=sk-...
-export GITHUB_TOKEN=ghp_...                                   # private repos
-export GITHUB_MCP_COMMAND="npx -y @modelcontextprotocol/server-github"
+#
+# GitHub's official MCP server is a Go binary, so the Go toolchain you already
+# have builds it. (The old npx @modelcontextprotocol/server-github is archived.)
+go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
+
+export ANTHROPIC_API_KEY=sk-ant-...
+export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_...
+export GITHUB_MCP_COMMAND="github-mcp-server stdio"
 
 # Preflight: connect, list the catalogue, fetch one file, exit. Run this first.
 go run ./cmd/testplan -github https://github.com/owner/repo -mcp-check
 
 go run ./cmd/testplan -github https://github.com/owner/repo -out plan.md
+
+# Windows cmd.exe uses set, and the value must NOT be quoted:
+#   set GITHUB_MCP_COMMAND=github-mcp-server stdio
+# Windows PowerShell:
+#   $env:GITHUB_MCP_COMMAND="github-mcp-server stdio"
 
 # A branch in the URL is honoured; -ref overrides it
 go run ./cmd/testplan -github https://github.com/owner/repo/tree/feature-x
