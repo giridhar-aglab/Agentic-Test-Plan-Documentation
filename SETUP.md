@@ -185,15 +185,31 @@ add it or reference the binary directly in the command below.
 
 ### Configure
 
+**MCP and the model backend are independent.** MCP is how the agent *reads
+code*; the model backend is how it *reasons about it*. Neither needs the other.
+
 ```cmd
-set ANTHROPIC_API_KEY=sk-ant-...
+:: Reading code over MCP — this is all Level 3 requires
 set GITHUB_PERSONAL_ACCESS_TOKEN=ghp_...
 set GITHUB_MCP_COMMAND=github-mcp-server stdio
 ```
 
-Note the token variable is `GITHUB_PERSONAL_ACCESS_TOKEN`, not `GITHUB_TOKEN`.
-The server inherits this process's environment, so setting it in the same
-terminal is enough.
+That alone gives you the survey, the full risk register, validation, traceability
+and working source links over MCP — with placeholder scenarios, since nothing is
+reasoning about the code yet. `-mcp-check` needs no model key whatsoever.
+
+Add a model backend from Level 1 — `OPENAI_API_KEY`, `OPENAI_BASE_URL` for a
+local model, or `ANTHROPIC_API_KEY` — only when you want real scenarios:
+
+```cmd
+set OPENAI_API_KEY=sk-...
+set OPENAI_MODEL=gpt-4o-mini
+```
+
+Note the GitHub variable is `GITHUB_PERSONAL_ACCESS_TOKEN`, not `GITHUB_TOKEN`,
+and it is read by *GitHub's server*, never by this program — which is why it
+never appears in this codebase. The subprocess inherits this terminal's
+environment, so setting it here is enough.
 
 If the binary is not on PATH:
 
@@ -249,6 +265,10 @@ Speaks JSON-RPC on stdio. `generate_test_plan` returns a task handle
 immediately; poll `tasks/get` for the finished document. Useful for showing the
 integration works in both directions.
 
+This is the same pipeline behind an MCP interface, so it reads the same model
+variables as the CLI and behaves the same way without them: it runs, and the
+scenarios are placeholders. Serving MCP does not itself need a model key.
+
 ---
 
 ## Every flag
@@ -283,6 +303,9 @@ Environment:
 | `OPENAI_MODEL_FAST` / `_BALANCED` / `_STRONG` | Per-tier overrides |
 | `GITHUB_MCP_COMMAND` | Command that starts the GitHub MCP server |
 | `GITHUB_PERSONAL_ACCESS_TOKEN` | Read by that server, not by this program |
+
+The two groups are orthogonal. Model variables affect *what the agent thinks*;
+GitHub variables affect *where it reads from*. Set either, both, or neither.
 
 ---
 
