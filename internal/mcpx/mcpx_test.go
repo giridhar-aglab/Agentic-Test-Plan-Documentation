@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -447,4 +448,103 @@ func TestGitHubSourceSatisfiesRepoSource(t *testing.T) {
 	// A compile-time assertion that the seam actually holds: if this stops
 	// being true, nothing downstream can use GitHub.
 	var _ repo.Source = (*GitHubSource)(nil)
+}
+
+// directoryServer serves a small repository through a file tool only, the way
+// GitHub's default toolset does: no tree tool, and a directory path returns a
+// listing rather than content.
+func directoryServer(listings map[string]string) *Server {
+	return &Server{
+		Name: "github", Version: "1",
+		Tools: []ServerTool{
+			{Name: "get_file_contents", InputSchema: json.RawMessage(`{"type":"object"}`),
+				Handler: func(ctx context.Context, arguments json.RawMessage) (string, error) {
+					var parameters struct {
+						Path string `json:"path"`
+					}
+					_ = json.Unmarshal(arguments, &parameters)
+					body, known := listings[parameters.Path]
+					if !known {
+						return "", fmt.Errorf("404 Not Found: %s", parameters.Path)
+					}
+					return body, nil
+				}},
+			{Name: "list_branches", InputSchema: json.RawMessage(`{"type":"object"}`),
+				Handler: func(context.Context, json.RawMessage) (string, error) {
+					return `[{"name":"main","sha":"abc","protected":false}]`, nil
+				}},
+		},
+	}
+}
+
+func TestTreeIsWalkedThroughTheFileToolWhenNoTreeToolExists(t *testing.T) {
+	// GitHub ships its tree tool in the "git" toolset, which is off by default.
+	// Refusing to run in the common configuration would be a choice, not a
+	// limitation: a directory listing is one call per directory and gets there.
+	client := startLoopback(t, directoryServer(map[string]string{
+		"/": `[{"name":"main.go","path":"main.go","type":"file","sha":"s1","size":10},
+		       {"name":"internal","path":"internal","type":"dir"}]`,
+		"internal": `[{"name":"ledger.go","path":"internal/ledger.go","type":"file","sha":"s2","size":20},
+		              {"name":"deep","path":"internal/deep","type":"dir"}]`,
+		"internal/deep": `[{"name":"x.go","path":"internal/deep/x.go","type":"file","sha":"s3","size":5}]`,
+	}))
+
+	resolved, err := ResolveToolNames(context.Background(), client)
+	if err != nil {
+		t.Fatalf("a file tool alone must resolve: %v", err)
+	}
+	if resolved.Tree != "" {
+		t.Fatalf("this catalogue has no tree tool, got %q", resolved.Tree)
+	}
+
+	source := NewGitHubSource(client, "owner", "repo", "", 400)
+	source.ToolNames = resolved
+	entries, err := source.Tree(context.Background())
+	if err != nil {
+		t.Fatalf("the walk must produce a listing: %v", err)
+	}
+
+	gotPaths := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		gotPaths = append(gotPaths, entry.Path)
+	}
+	wantPaths := []string{"internal/deep/x.go", "internal/ledger.go", "main.go"}
+	if strings.Join(gotPaths, ",") != strings.Join(wantPaths, ",") {
+		t.Fatalf("expected %v, got %v", wantPaths, gotPaths)
+	}
+	// Blob SHAs are the analysis cache key, so losing them on this path would
+	// quietly disable caching rather than fail.
+	if entries[2].BlobSHA != "s1" || entries[2].SizeBytes != 10 {
+		t.Errorf("entry metadata was lost in the walk: %+v", entries[2])
+	}
+}
+
+func TestAnUnusableTreeToolFallsBackInsteadOfEndingTheRun(t *testing.T) {
+	// The production failure: with no tree tool enabled, the resolver picked
+	// list_branches and the run died on a payload that decoded fine and meant
+	// nothing. Resolution no longer picks it — and if a server's tree tool
+	// returns something unrecognisable anyway, the walk still gets there.
+	client := startLoopback(t, directoryServer(map[string]string{
+		"/": `[{"name":"main.go","path":"main.go","type":"file","sha":"s1","size":10}]`,
+	}))
+
+	var logged []string
+	source := NewGitHubSource(client, "owner", "repo", "", 400)
+	source.ToolNames = GitHubToolNames{Tree: "list_branches", GetFile: "get_file_contents"}
+	source.Logf = func(format string, arguments ...any) {
+		logged = append(logged, fmt.Sprintf(format, arguments...))
+	}
+
+	entries, err := source.Tree(context.Background())
+	if err != nil {
+		t.Fatalf("an unusable tree tool must degrade, not end the run: %v", err)
+	}
+	if len(entries) != 1 || entries[0].Path != "main.go" {
+		t.Fatalf("unexpected entries %+v", entries)
+	}
+	// A silent fallback would make a slow run look like a fast one and hide a
+	// misconfigured server.
+	if len(logged) == 0 || !strings.Contains(strings.Join(logged, " "), "falling back") {
+		t.Errorf("the degradation must be reported, got %v", logged)
+	}
 }

@@ -53,13 +53,20 @@ func TestSpillStoreRoundTripsAndDigests(t *testing.T) {
 	if _, found := spillStore.Get("spill-999-deadbeef"); found {
 		t.Fatal("an unknown handle must not resolve")
 	}
+	if handles := spillStore.Handles(); len(handles) != 1 || handles[0] != handle {
+		t.Fatalf("the store must be able to name what it holds, got %v", handles)
+	}
 
 	digest := Digest(largePayload, 100)
-	if len(digest) > 300 {
+	if len(digest) > 400 {
 		t.Fatalf("a digest must be far smaller than the payload, got %d bytes", len(digest))
 	}
-	if !strings.Contains(digest, "fetch the rest by handle") {
-		t.Fatal("a digest must tell the model how to get the rest")
+	// This assertion used to read "fetch the rest by handle", and it passed for
+	// the whole time no tool could do that. Naming the tool is what makes the
+	// instruction checkable — agent/loop_test asserts the same name is
+	// registered.
+	if !strings.Contains(digest, "context_fetch") {
+		t.Fatal("a digest must name the tool that retrieves the rest")
 	}
 	if short := Digest("tiny", 100); short != "tiny" {
 		t.Fatalf("a payload under the limit must pass through unchanged, got %q", short)

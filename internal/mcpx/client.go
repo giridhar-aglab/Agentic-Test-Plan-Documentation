@@ -16,6 +16,7 @@ package mcpx
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/giri-ms19/testplan-agent/internal/tool"
 )
@@ -103,13 +105,69 @@ type discoverResult struct {
 }
 
 // callToolResult is one tool invocation's outcome.
+//
+// Every content block type the specification defines is modelled here, not
+// only "text". A client that understands one block type does not report an
+// error when it meets another — it returns an empty string, which is
+// indistinguishable from an empty file and impossible to debug from the
+// outside. GitHub's server returns file contents as an embedded resource, so
+// modelling only "text" silently emptied every file this system read.
 type callToolResult struct {
-	Content []struct {
-		Type string `json:"type"`
-		Text string `json:"text"`
-	} `json:"content"`
-	IsError    bool   `json:"isError"`
-	ResultType string `json:"resultType"`
+	Content    []contentBlock `json:"content"`
+	IsError    bool           `json:"isError"`
+	ResultType string         `json:"resultType"`
+}
+
+type contentBlock struct {
+	Type string `json:"type"`
+	// Text carries a "text" block.
+	Text string `json:"text"`
+	// Data carries base64 bytes on "image" and "audio" blocks.
+	Data     string `json:"data"`
+	MimeType string `json:"mimeType"`
+	// URI names the target of a "resource_link" block, which carries no
+	// content at all — only a pointer.
+	URI string `json:"uri"`
+	// Resource carries an embedded "resource" block.
+	Resource *struct {
+		URI      string `json:"uri"`
+		MimeType string `json:"mimeType"`
+		Text     string `json:"text"`
+		Blob     string `json:"blob"`
+	} `json:"resource"`
+}
+
+// text returns the readable content of one block, and whether it had any.
+func (block contentBlock) text() (string, bool) {
+	switch block.Type {
+	case "text":
+		return block.Text, block.Text != ""
+
+	case "resource":
+		if block.Resource == nil {
+			return "", false
+		}
+		if block.Resource.Text != "" {
+			return block.Resource.Text, true
+		}
+		// A blob is base64. It is usually binary, but GitHub sends text this
+		// way too, so decode and keep it if the result is readable.
+		if decoded, err := base64.StdEncoding.DecodeString(block.Resource.Blob); err == nil {
+			if utf8.Valid(decoded) {
+				return string(decoded), len(decoded) > 0
+			}
+		}
+		return "", false
+
+	case "resource_link":
+		// Deliberately not silent: the server is saying "the content is over
+		// there", and a caller that treats this as an empty file will loop
+		// trying to read it again.
+		return fmt.Sprintf("[the server returned a link rather than content: %s]", block.URI), false
+
+	default:
+		return "", false
+	}
 }
 
 // Transport is a bidirectional byte stream to a server.
@@ -342,10 +400,22 @@ func (client *Client) CallTool(ctx context.Context, toolName string, arguments j
 	}
 
 	var contentBuilder strings.Builder
-	for _, contentBlock := range called.Content {
-		if contentBlock.Type == "text" {
-			contentBuilder.WriteString(contentBlock.Text)
-		}
+	blockTypes := make([]string, 0, len(called.Content))
+	anyContent := false
+	for _, block := range called.Content {
+		blockTypes = append(blockTypes, block.Type)
+		text, hadContent := block.text()
+		contentBuilder.WriteString(text)
+		anyContent = anyContent || hadContent
+	}
+
+	// Silence here is the worst outcome: the caller cannot tell an empty file
+	// from a block type this client does not understand, and a model handed an
+	// empty file simply reads it again.
+	if !anyContent && len(called.Content) > 0 && !called.IsError {
+		return contentBuilder.String(), true, fmt.Errorf(
+			"mcp: %s returned no readable content (blocks: %s)",
+			toolName, strings.Join(blockTypes, ", "))
 	}
 	return contentBuilder.String(), called.IsError, nil
 }

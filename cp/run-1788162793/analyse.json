@@ -1,0 +1,3199 @@
+{
+  "runId": "run-1788162793",
+  "startedAt": "2026-08-31T07:53:13.787252Z",
+  "revision": 18,
+  "repoMap": {
+    "repositoryName": "gin/binding",
+    "commitSha": "",
+    "languages": [
+      "go"
+    ],
+    "files": [
+      {
+        "path": "binding.go",
+        "blobSha": "62b8c94aebc672ca5d1491688e51587e7d4eacd0",
+        "sizeBytes": 4421,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "binding_msgpack_test.go",
+        "blobSha": "7578a58c6cea623d61b7eb05233ef6dc6599f79f",
+        "sizeBytes": 1482,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "binding_nomsgpack.go",
+        "blobSha": "6d651b52ba044de6372235649ad7daec694dfc69",
+        "sizeBytes": 3943,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "binding_test.go",
+        "blobSha": "d51d29feee141a3420498d4d809cfcdad967f6b6",
+        "sizeBytes": 40952,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "bson.go",
+        "blobSha": "d1e9af2ba362d620064e380b17295a164048a53c",
+        "sizeBytes": 610,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "default_validator.go",
+        "blobSha": "6f328d46b1ea682ccb83445f516aa621a7734aca",
+        "sizeBytes": 2440,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "default_validator_benchmark_test.go",
+        "blobSha": "140940388c070740ceaab6371d98c1714f959319",
+        "sizeBytes": 521,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "default_validator_test.go",
+        "blobSha": "003be127999e27e88aac7a07bf5b031fd3b794a8",
+        "sizeBytes": 3681,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "form.go",
+        "blobSha": "a4f967daf13810609775262ce892f3c0ea16e8a8",
+        "sizeBytes": 1421,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "form_mapping.go",
+        "blobSha": "410d3d2e2f8967161c113a5cd75fcf21194697f1",
+        "sizeBytes": 14152,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "form_mapping_benchmark_test.go",
+        "blobSha": "f030961770a29aa7e6645f66cf52adf4bbf44e33",
+        "sizeBytes": 1535,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "form_mapping_test.go",
+        "blobSha": "132468cf7876fc78be8bd357b06481b73fa7eba1",
+        "sizeBytes": 35298,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "header.go",
+        "blobSha": "123a8e5b9f269ebdbc78911057f949245eb956d5",
+        "sizeBytes": 905,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "json.go",
+        "blobSha": "c74d4a84f62634e8a39ca38e77797c22c83ccced",
+        "sizeBytes": 1599,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "json_test.go",
+        "blobSha": "d64845b939a0a3088e24114272945473a70e3547",
+        "sizeBytes": 5740,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "msgpack.go",
+        "blobSha": "cd7064275775b8d676ae6786d318066778664745",
+        "sizeBytes": 805,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "msgpack_test.go",
+        "blobSha": "ada35e46f257d5dd28e50b4c640786d04831f299",
+        "sizeBytes": 819,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "multipart_form_mapping.go",
+        "blobSha": "33d33adc18225bbda241b21a646ac5e4b0fa8aeb",
+        "sizeBytes": 2318,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "blobSha": "843c9627b3c7f86dc6e30a0254e70517c81c640e",
+        "sizeBytes": 3933,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "plain.go",
+        "blobSha": "a5af2489b69418e95196a5184c67a2526b100824",
+        "sizeBytes": 924,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "protobuf.go",
+        "blobSha": "7f5bafeec302d242b414fdcf34c198d72ec6f118",
+        "sizeBytes": 964,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "query.go",
+        "blobSha": "fa82455350e219330cafdaede4dfc052b6e279d2",
+        "sizeBytes": 481,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "toml.go",
+        "blobSha": "09f2818b5572e659921d320411ab8ae0197881f6",
+        "sizeBytes": 733,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "toml_test.go",
+        "blobSha": "8489b8ef318d9a86f6c370a20b773e167beb1a9c",
+        "sizeBytes": 525,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "uri.go",
+        "blobSha": "a571a32d18f574254d6548d1ae7d15441a230e45",
+        "sizeBytes": 417,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "validate_test.go",
+        "blobSha": "3b709904144bd9f40137181ff0602a196f10e618",
+        "sizeBytes": 6378,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "xml.go",
+        "blobSha": "954a561ce1d23acd456ec204ece633977138ef59",
+        "sizeBytes": 711,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "xml_test.go",
+        "blobSha": "aabfb5bd7ccb6bf0690dfb63327dba6a7e06bf8a",
+        "sizeBytes": 585,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "yaml.go",
+        "blobSha": "78779ac7c085b92106b85607ec1b2d1d6771e702",
+        "sizeBytes": 726,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "yaml_test.go",
+        "blobSha": "8dcd97ef84ce154b37def0ed010e3d86bce57fef",
+        "sizeBytes": 501,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      }
+    ],
+    "dependencies": null,
+    "existingTests": [
+      {
+        "path": "binding_msgpack_test.go",
+        "testName": "TestBindingMsgPack",
+        "coversRef": {
+          "path": "binding_msgpack.go",
+          "symbol": "BindingMsgPack"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_msgpack_test.go",
+        "testName": "TestBindingDefaultMsgPack",
+        "coversRef": {
+          "path": "binding_msgpack.go",
+          "symbol": "BindingDefaultMsgPack"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingDefault",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONNilBody",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONNilBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSON",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSON"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONSlice",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONSlice"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONUseNumber",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONUseNumber"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONUseNumber2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONUseNumber2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONDisallowUnknownFields",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONDisallowUnknownFields"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingForm",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingForm2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingForm2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormEmbeddedStruct",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormEmbeddedStruct"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormEmbeddedStruct2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormEmbeddedStruct2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormDefaultValue",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormDefaultValue"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormDefaultValue2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormDefaultValue2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormForTime",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormForTime"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormForTime2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormForTime2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormBindingIgnoreField",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormBindingIgnoreField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormInvalidName",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormInvalidName"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormInvalidName2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormInvalidName2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormForType",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormForType"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormStringSliceMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormStringSliceMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQuery",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQuery"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQuery2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQuery2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryFail2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryFail2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryBoolFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryBoolFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingXML",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingXML"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingXMLFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingXMLFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingTOML",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingTOML"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingTOMLFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingTOMLFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingYAML",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingYAML"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingYAMLStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingYAMLStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingYAMLFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingYAMLFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormPost",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormPost"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingDefaultValueFormPost",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingDefaultValueFormPost"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormPostForMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormPostForMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormPostForMapFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormPostForMapFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormFilesMultipart",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormFilesMultipart"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormFilesMultipartFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormFilesMultipartFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormMultipart",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormMultipart"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormMultipartForMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormMultipartForMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormMultipartForMapFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormMultipartForMapFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingProtoBuf",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingProtoBuf"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingProtoBufFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingProtoBufFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingBSON",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingBSON"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestValidationFails",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "ValidationFails"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestValidationDisabled",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "ValidationDisabled"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestRequiredSucceeds",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "RequiredSucceeds"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestRequiredFails",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "RequiredFails"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestHeaderBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "HeaderBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestUriBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "UriBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestUriInnerBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "UriInnerBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormBindingFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormBindingFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormBindingMultipartFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormBindingMultipartFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormPostBindingFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormPostBindingFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormMultipartBindingFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormMultipartBindingFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestPlainBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "PlainBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "default_validator_test.go",
+        "testName": "TestSliceValidationError",
+        "coversRef": {
+          "path": "default_validator.go",
+          "symbol": "SliceValidationError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "default_validator_test.go",
+        "testName": "TestDefaultValidator",
+        "coversRef": {
+          "path": "default_validator.go",
+          "symbol": "DefaultValidator"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingBaseTypes",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingBaseTypes"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingSkipField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingSkipField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingIgnoreField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingIgnoreField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUnexportedField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUnexportedField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingPrivateField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingPrivateField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUnknownFieldType",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUnknownFieldType"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingURI",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingURI"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingFormFieldNotSent",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingFormFieldNotSent"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingFormWithEmptyToDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingFormWithEmptyToDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMapFormWithTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MapFormWithTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingTime",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingTime"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingTimeUnixNano",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingTimeUnixNano"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingTimeDuration",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingTimeDuration"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingSlice",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingSlice"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingArray",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingArray"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCollectionFormat",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCollectionFormat"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCollectionFormatInvalid",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCollectionFormatInvalid"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingMultipleDefaultWithCollectionFormat",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingMultipleDefaultWithCollectionFormat"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingStructField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingStructField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingPtrField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingPtrField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingMapField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingMapField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingIgnoredCircularRef",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingIgnoredCircularRef"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalParamHexWithFormTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalParamHexWithFormTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalParamHexWithURITag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalParamHexWithURITag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalParamHexDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalParamHexDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeWithFormTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeWithFormTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeWithURITag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeWithURITag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeWithFormTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeWithFormTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeWithURITag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeWithURITag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceStopsWhenError",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceStopsWhenError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalTextHexUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalTextHexUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalTextHexForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalTextHexForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalTextHexDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalTextHexDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUnmarshalTextStopsWhenError",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUnmarshalTextStopsWhenError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUnmarshalTextDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUnmarshalTextDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUnmarshalTextDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUnmarshalTextDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyBindUnmarshalerDefined",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyBindUnmarshalerDefined"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyTextUnmarshalerDefined",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyTextUnmarshalerDefined"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUsingTextUnmarshalerWhenBindUnmarshalerAlsoDefined",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUsingTextUnmarshalerWhenBindUnmarshalerAlsoDefined"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingEmptyValues",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingEmptyValues"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "json_test.go",
+        "testName": "TestJSONBindingBindBody",
+        "coversRef": {
+          "path": "json.go",
+          "symbol": "JSONBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "json_test.go",
+        "testName": "TestJSONBindingBindBodyMap",
+        "coversRef": {
+          "path": "json.go",
+          "symbol": "JSONBindingBindBodyMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "json_test.go",
+        "testName": "TestCustomJsonCodec",
+        "coversRef": {
+          "path": "json.go",
+          "symbol": "CustomJsonCodec"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "msgpack_test.go",
+        "testName": "TestMsgpackBindingBindBody",
+        "coversRef": {
+          "path": "msgpack.go",
+          "symbol": "MsgpackBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "testName": "TestFormMultipartBindingBindOneFile",
+        "coversRef": {
+          "path": "multipart_form_mapping.go",
+          "symbol": "FormMultipartBindingBindOneFile"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "testName": "TestFormMultipartBindingBindTwoFiles",
+        "coversRef": {
+          "path": "multipart_form_mapping.go",
+          "symbol": "FormMultipartBindingBindTwoFiles"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "testName": "TestFormMultipartBindingBindError",
+        "coversRef": {
+          "path": "multipart_form_mapping.go",
+          "symbol": "FormMultipartBindingBindError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "toml_test.go",
+        "testName": "TestTOMLBindingBindBody",
+        "coversRef": {
+          "path": "toml.go",
+          "symbol": "TOMLBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidateNoValidationValues",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidateNoValidationValues"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidateNoValidationPointers",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidateNoValidationPointers"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidatePrimitives",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidatePrimitives"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidateAndModifyStruct",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidateAndModifyStruct"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidatorEngine",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidatorEngine"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "xml_test.go",
+        "testName": "TestXMLBindingBindBody",
+        "coversRef": {
+          "path": "xml.go",
+          "symbol": "XMLBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "yaml_test.go",
+        "testName": "TestYAMLBindingBindBody",
+        "coversRef": {
+          "path": "yaml.go",
+          "symbol": "YAMLBindingBindBody"
+        },
+        "matchedByAst": true
+      }
+    ],
+    "entrypoints": null,
+    "testFrameworkName": "go test",
+    "surveyedAt": "2026-08-31T07:53:13.7961452Z"
+  },
+  "componentModels": [
+    {
+      "componentName": "binding_nomsgpack",
+      "path": "binding_nomsgpack.go",
+      "blobSha": "6d651b52ba044de6372235649ad7daec694dfc69",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component defines interfaces and a function related to handling binding of HTTP request data such as JSON, query parameters, and form data.",
+      "publicSymbols": [
+        {
+          "name": "Binding",
+          "kind": "interface",
+          "docComment": "Binding describes the interface which needs to be implemented for binding the\ndata present in the request such as JSON request body, query parameters or\nthe form POST.",
+          "ref": {
+            "path": "binding_nomsgpack.go",
+            "symbol": "Binding",
+            "startLine": 30,
+            "endLine": 33
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "BindingBody",
+          "kind": "interface",
+          "docComment": "BindingBody adds BindBody method to Binding. BindBody is similar with Bind,\nbut it reads the body from supplied bytes instead of req.Body.",
+          "ref": {
+            "path": "binding_nomsgpack.go",
+            "symbol": "BindingBody",
+            "startLine": 37,
+            "endLine": 40
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "BindingUri",
+          "kind": "interface",
+          "docComment": "BindingUri adds BindUri method to Binding. BindUri is similar with Bind,\nbut it reads the Params.",
+          "ref": {
+            "path": "binding_nomsgpack.go",
+            "symbol": "BindingUri",
+            "startLine": 44,
+            "endLine": 47
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "StructValidator",
+          "kind": "interface",
+          "docComment": "StructValidator is the minimal interface which needs to be implemented in\norder for it to be used as the validator engine for ensuring the correctness\nof the request. Gin provides a default implementation for this using\nhttps://github.com/go-playground/validator/tree/v10.6.1.",
+          "ref": {
+            "path": "binding_nomsgpack.go",
+            "symbol": "StructValidator",
+            "startLine": 53,
+            "endLine": 64
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "Default",
+          "kind": "func",
+          "signature": "func Default(method, contentType string) (Binding)",
+          "docComment": "Default returns the appropriate Binding instance based on the HTTP method\nand the content type.",
+          "ref": {
+            "path": "binding_nomsgpack.go",
+            "symbol": "Default",
+            "startLine": 91,
+            "endLine": 114
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 10,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "http",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "The component interacts with HTTP methods and types."
+        }
+      ],
+      "errorPaths": [
+        "validate returns an error",
+        "Invalid HTTP method or content type in Default function",
+        "Validation errors in validate function"
+      ],
+      "sideEffects": [],
+      "complexityScore": 12,
+      "confidence": 0.8,
+      "analysedAt": "2026-08-31T07:53:16.5994194Z"
+    },
+    {
+      "componentName": "default_validator",
+      "path": "default_validator.go",
+      "blobSha": "6f328d46b1ea682ccb83445f516aa621a7734aca",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component is responsible for validating structs and providing error handling for validation failures in Go, using the validator library.",
+      "publicSymbols": [
+        {
+          "name": "SliceValidationError",
+          "kind": "type",
+          "ref": {
+            "path": "default_validator.go",
+            "symbol": "SliceValidationError",
+            "startLine": 21,
+            "endLine": 21
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "Error",
+          "kind": "method",
+          "receiver": "SliceValidationError",
+          "signature": "func (SliceValidationError) Error() (string)",
+          "docComment": "Error concatenates all error elements in SliceValidationError into a single string separated by \\n.",
+          "ref": {
+            "path": "default_validator.go",
+            "symbol": "SliceValidationError.Error",
+            "startLine": 24,
+            "endLine": 42
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 5,
+          "parameterCount": 0
+        },
+        {
+          "name": "ValidateStruct",
+          "kind": "method",
+          "receiver": "*defaultValidator",
+          "signature": "func (*defaultValidator) ValidateStruct(obj any) (error)",
+          "docComment": "ValidateStruct receives any kind of type, but only performed struct or pointer to struct type.",
+          "ref": {
+            "path": "default_validator.go",
+            "symbol": "*defaultValidator.ValidateStruct",
+            "startLine": 47,
+            "endLine": 76
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 10,
+          "parameterCount": 1
+        },
+        {
+          "name": "Engine",
+          "kind": "method",
+          "receiver": "*defaultValidator",
+          "signature": "func (*defaultValidator) Engine() (any)",
+          "docComment": "Engine returns the underlying validator engine which powers the default\nValidator instance. This is useful if you want to register custom validations\nor struct level validations. See validator GoDoc for more info -\nhttps://pkg.go.dev/github.com/go-playground/validator/v10",
+          "ref": {
+            "path": "default_validator.go",
+            "symbol": "*defaultValidator.Engine",
+            "startLine": 88,
+            "endLine": 91
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/go-playground/validator/v10",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        }
+      ],
+      "errorPaths": [
+        "ValidateStruct returns an error",
+        "Validation failure due to invalid struct fields",
+        "Nil pointer dereference when the input is nil",
+        "Reflection error when inspecting the struct",
+        "Custom validation error handling",
+        "Error during initialization of validator engine"
+      ],
+      "sideEffects": [
+        "Mutation of validation errors into SliceValidationError"
+      ],
+      "complexityScore": 18,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:16.9632866Z"
+    },
+    {
+      "componentName": "binding",
+      "path": "binding.go",
+      "blobSha": "62b8c94aebc672ca5d1491688e51587e7d4eacd0",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component provides interfaces and functions for binding request data (like JSON or query parameters) and validating the request structure.",
+      "publicSymbols": [
+        {
+          "name": "Binding",
+          "kind": "interface",
+          "docComment": "Binding describes the interface which needs to be implemented for binding the\ndata present in the request such as JSON request body, query parameters or\nthe form POST.",
+          "ref": {
+            "path": "binding.go",
+            "symbol": "Binding",
+            "startLine": 32,
+            "endLine": 35
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "BindingBody",
+          "kind": "interface",
+          "docComment": "BindingBody adds BindBody method to Binding. BindBody is similar with Bind,\nbut it reads the body from supplied bytes instead of req.Body.",
+          "ref": {
+            "path": "binding.go",
+            "symbol": "BindingBody",
+            "startLine": 39,
+            "endLine": 42
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "BindingUri",
+          "kind": "interface",
+          "docComment": "BindingUri adds BindUri method to Binding. BindUri is similar with Bind,\nbut it reads the Params.",
+          "ref": {
+            "path": "binding.go",
+            "symbol": "BindingUri",
+            "startLine": 46,
+            "endLine": 49
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "StructValidator",
+          "kind": "interface",
+          "docComment": "StructValidator is the minimal interface which needs to be implemented in\norder for it to be used as the validator engine for ensuring the correctness\nof the request. Gin provides a default implementation for this using\nhttps://github.com/go-playground/validator/tree/v10.6.1.",
+          "ref": {
+            "path": "binding.go",
+            "symbol": "StructValidator",
+            "startLine": 55,
+            "endLine": 67
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        },
+        {
+          "name": "Default",
+          "kind": "func",
+          "signature": "func Default(method, contentType string) (Binding)",
+          "docComment": "Default returns the appropriate Binding instance based on the HTTP method\nand the content type.",
+          "ref": {
+            "path": "binding.go",
+            "symbol": "Default",
+            "startLine": 95,
+            "endLine": 120
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 11,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "http",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "The component interacts with the http package for determining binding based on HTTP method and content type."
+        }
+      ],
+      "errorPaths": [
+        "validate returns an error",
+        "Invalid HTTP method or content type",
+        "Validation fails"
+      ],
+      "sideEffects": [],
+      "complexityScore": 13,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:16.9632866Z"
+    },
+    {
+      "componentName": "bson",
+      "path": "bson.go",
+      "blobSha": "d1e9af2ba362d620064e380b17295a164048a53c",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component provides methods to bind BSON data to Go objects, including HTTP request and raw byte body binding.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "bsonBinding",
+          "signature": "func (bsonBinding) Name() (string)",
+          "ref": {
+            "path": "bson.go",
+            "symbol": "bsonBinding.Name",
+            "startLine": 16,
+            "endLine": 18
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "bsonBinding",
+          "signature": "func (bsonBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "bson.go",
+            "symbol": "bsonBinding.Bind",
+            "startLine": 20,
+            "endLine": 26
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "bsonBinding",
+          "signature": "func (bsonBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "bson.go",
+            "symbol": "bsonBinding.BindBody",
+            "startLine": 28,
+            "endLine": 30
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "go.mongodb.org/mongo-driver/v2/bson",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "Decode",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate BSON decoding during tests."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "Invalid BSON data format",
+        "Invalid input object provided",
+        "Failed to decode BSON body"
+      ],
+      "sideEffects": [
+        "Mutates the input object by populating it with data from BSON"
+      ],
+      "complexityScore": 4,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:16.9632866Z"
+    },
+    {
+      "componentName": "form",
+      "path": "form.go",
+      "blobSha": "a4f967daf13810609775262ce892f3c0ea16e8a8",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "This component is responsible for binding form data from HTTP requests into Go data structures, supporting both standard and multipart forms.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "formBinding",
+          "signature": "func (formBinding) Name() (string)",
+          "ref": {
+            "path": "form.go",
+            "symbol": "formBinding.Name",
+            "startLine": 20,
+            "endLine": 22
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "formBinding",
+          "signature": "func (formBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "form.go",
+            "symbol": "formBinding.Bind",
+            "startLine": 24,
+            "endLine": 35
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 5,
+          "parameterCount": 2
+        },
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "formPostBinding",
+          "signature": "func (formPostBinding) Name() (string)",
+          "ref": {
+            "path": "form.go",
+            "symbol": "formPostBinding.Name",
+            "startLine": 37,
+            "endLine": 39
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "formPostBinding",
+          "signature": "func (formPostBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "form.go",
+            "symbol": "formPostBinding.Bind",
+            "startLine": 41,
+            "endLine": 49
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 3,
+          "parameterCount": 2
+        },
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "formMultipartBinding",
+          "signature": "func (formMultipartBinding) Name() (string)",
+          "ref": {
+            "path": "form.go",
+            "symbol": "formMultipartBinding.Name",
+            "startLine": 51,
+            "endLine": 53
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "formMultipartBinding",
+          "signature": "func (formMultipartBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "form.go",
+            "symbol": "formMultipartBinding.Bind",
+            "startLine": 55,
+            "endLine": 64
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 3,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "HTTP request data is read during binding."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "Invalid request object",
+        "Unsupported content type",
+        "Binding failure due to invalid data",
+        "Decoding error",
+        "Mutation of the input object fails"
+      ],
+      "sideEffects": [
+        "Mutates the provided object with bound data"
+      ],
+      "complexityScore": 14,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:19.883812Z"
+    },
+    {
+      "componentName": "header",
+      "path": "header.go",
+      "blobSha": "123a8e5b9f269ebdbc78911057f949245eb956d5",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component handles HTTP header binding and mapping to struct fields, as well as providing utility methods for working with header data.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "headerBinding",
+          "signature": "func (headerBinding) Name() (string)",
+          "ref": {
+            "path": "header.go",
+            "symbol": "headerBinding.Name",
+            "startLine": 15,
+            "endLine": 17
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "headerBinding",
+          "signature": "func (headerBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "header.go",
+            "symbol": "headerBinding.Bind",
+            "startLine": 19,
+            "endLine": 25
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 2
+        },
+        {
+          "name": "TrySet",
+          "kind": "method",
+          "receiver": "headerSource",
+          "signature": "func (headerSource) TrySet(value reflect.Value, field reflect.StructField, tagValue string, opt setOptions) (bool, error)",
+          "ref": {
+            "path": "header.go",
+            "symbol": "headerSource.TrySet",
+            "startLine": 35,
+            "endLine": 37
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 4
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "Bind method depends on http.Request for binding header data"
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "mapHeader returns an error",
+        "TrySet returns an error",
+        "Invalid HTTP request passed to Bind method",
+        "Invalid struct passed to mapHeader function",
+        "Struct field cannot accept the provided value in TrySet method",
+        "Reflection operations fail in TrySet method"
+      ],
+      "sideEffects": [
+        "Mutates the passed struct object during Bind and TrySet methods"
+      ],
+      "complexityScore": 5,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:20.0698588Z"
+    },
+    {
+      "componentName": "json",
+      "path": "json.go",
+      "blobSha": "c74d4a84f62634e8a39ca38e77797c22c83ccced",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "This component provides functionality for JSON binding in HTTP requests, converting request bodies or JSON data into Go objects.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "jsonBinding",
+          "signature": "func (jsonBinding) Name() (string)",
+          "ref": {
+            "path": "json.go",
+            "symbol": "jsonBinding.Name",
+            "startLine": 29,
+            "endLine": 31
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "jsonBinding",
+          "signature": "func (jsonBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "json.go",
+            "symbol": "jsonBinding.Bind",
+            "startLine": 33,
+            "endLine": 38
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 3,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "jsonBinding",
+          "signature": "func (jsonBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "json.go",
+            "symbol": "jsonBinding.BindBody",
+            "startLine": 40,
+            "endLine": 42
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/gin-gonic/gin/codec/json",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "Required to test Bind and BindBody methods."
+        },
+        {
+          "name": "decodeJSON",
+          "language": "go",
+          "direct": false,
+          "requiresMock": false,
+          "reason": "Internal function that handles JSON decoding."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "decodeJSON returns an error",
+        "Invalid JSON in request body",
+        "Malformed HTTP request",
+        "Failure to decode JSON data"
+      ],
+      "sideEffects": [
+        "Mutates the obj argument in-place with decoded values"
+      ],
+      "complexityScore": 9,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:21.0498293Z"
+    },
+    {
+      "componentName": "msgpack",
+      "path": "msgpack.go",
+      "blobSha": "cd7064275775b8d676ae6786d318066778664745",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "This component is responsible for handling MsgPack data binding in HTTP requests, providing methods to bind request data and message bodies to objects.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "msgpackBinding",
+          "signature": "func (msgpackBinding) Name() (string)",
+          "ref": {
+            "path": "msgpack.go",
+            "symbol": "msgpackBinding.Name",
+            "startLine": 19,
+            "endLine": 21
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "msgpackBinding",
+          "signature": "func (msgpackBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "msgpack.go",
+            "symbol": "msgpackBinding.Bind",
+            "startLine": 23,
+            "endLine": 25
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "msgpackBinding",
+          "signature": "func (msgpackBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "msgpack.go",
+            "symbol": "msgpackBinding.BindBody",
+            "startLine": 27,
+            "endLine": 29
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/ugorji/go/codec",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "codec.Decode",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To test binding methods that rely on decoding MsgPack."
+        },
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate different HTTP requests during tests."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "decodeMsgPack returns an error",
+        "Invalid request format",
+        "Unsupported content type",
+        "Error decoding message pack",
+        "IO error reading from request",
+        "Error writing response"
+      ],
+      "sideEffects": [
+        "Reads from HTTP request body",
+        "Writes to an object passed by reference"
+      ],
+      "complexityScore": 5,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:22.9753443Z"
+    },
+    {
+      "componentName": "multipart_form_mapping",
+      "path": "multipart_form_mapping.go",
+      "blobSha": "33d33adc18225bbda241b21a646ac5e4b0fa8aeb",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "This component handles setting values from multipart form files into struct fields, facilitating the binding of file uploads to data structures.",
+      "publicSymbols": [
+        {
+          "name": "TrySet",
+          "kind": "method",
+          "receiver": "*multipartRequest",
+          "signature": "func (*multipartRequest) TrySet(value reflect.Value, field reflect.StructField, key string, opt setOptions) (bool, error)",
+          "docComment": "TrySet tries to set a value by the multipart request with the binding a form file",
+          "ref": {
+            "path": "multipart_form_mapping.go",
+            "symbol": "*multipartRequest.TrySet",
+            "startLine": 27,
+            "endLine": 33
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 4
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "errors.New",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate error scenarios."
+        },
+        {
+          "name": "reflect.Value.Set",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To verify the value is being set correctly."
+        }
+      ],
+      "errorPaths": [
+        "TrySet returns an error",
+        "setByMultipartFormFile returns an error",
+        "setArrayOfMultipartFormFiles returns an error",
+        "Failed to set value from multipart request",
+        "Failed to bind multipart form file",
+        "Failed to set array of multipart form files",
+        "Invalid field type for binding",
+        "File not found in multipart form"
+      ],
+      "sideEffects": [
+        "Mutates struct fields with uploaded files"
+      ],
+      "complexityScore": 16,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:23.4172309Z"
+    },
+    {
+      "componentName": "form_mapping",
+      "path": "form_mapping.go",
+      "blobSha": "410d3d2e2f8967161c113a5cd75fcf21194697f1",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "Maps form data from URI or multipart form to struct fields via reflection based on struct tags.",
+      "publicSymbols": [
+        {
+          "name": "MapFormWithTag",
+          "kind": "func",
+          "signature": "func MapFormWithTag(ptr any, form map[string][]string, tag string) (error)",
+          "ref": {
+            "path": "form_mapping.go",
+            "symbol": "MapFormWithTag",
+            "startLine": 40,
+            "endLine": 42
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 3
+        },
+        {
+          "name": "TrySet",
+          "kind": "method",
+          "receiver": "formSource",
+          "signature": "func (formSource) TrySet(value reflect.Value, field reflect.StructField, tagValue string, opt setOptions) (isSet bool, err error)",
+          "docComment": "TrySet tries to set a value by request's form source (like map[string][]string)",
+          "ref": {
+            "path": "form_mapping.go",
+            "symbol": "formSource.TrySet",
+            "startLine": 75,
+            "endLine": 77
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 4
+        },
+        {
+          "name": "BindUnmarshaler",
+          "kind": "interface",
+          "docComment": "BindUnmarshaler is the interface used to wrap the UnmarshalParam method.",
+          "ref": {
+            "path": "form_mapping.go",
+            "symbol": "BindUnmarshaler",
+            "startLine": 183,
+            "endLine": 186
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 0,
+          "parameterCount": 0
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/gin-gonic/gin/codec/json",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "github.com/gin-gonic/gin/internal/bytesconv",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "strconv.ParseUint",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate parsing errors."
+        },
+        {
+          "name": "strconv.ParseBool",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate parsing errors."
+        },
+        {
+          "name": "strconv.ParseFloat",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate parsing errors."
+        },
+        {
+          "name": "strconv.ParseInt",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate parsing errors."
+        },
+        {
+          "name": "time.ParseInLocation",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate parsing errors."
+        },
+        {
+          "name": "time.LoadLocation",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate loading errors."
+        },
+        {
+          "name": "time.ParseDuration",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate parsing errors."
+        },
+        {
+          "name": "maps.Copy",
+          "language": "go",
+          "direct": false,
+          "requiresMock": false,
+          "reason": "No mock needed as it's just a copy operation."
+        }
+      ],
+      "errorPaths": [
+        "mapURI returns an error",
+        "mapForm returns an error",
+        "MapFormWithTag returns an error",
+        "mapFormByTag returns an error",
+        "TrySet returns an error",
+        "mappingByPtr returns an error",
+        "mapping returns an error",
+        "tryToSetValue returns an error",
+        "trySetCustom returns an error",
+        "trySetUsingParser returns an error",
+        "trySplit returns an error",
+        "setByForm returns an error",
+        "setWithProperType returns an error",
+        "setIntField returns an error",
+        "setUintField returns an error",
+        "setBoolField returns an error",
+        "setFloatField returns an error",
+        "setTimeField returns an error",
+        "setArray returns an error",
+        "setSlice returns an error",
+        "setTimeDuration returns an error",
+        "setFormMap returns an error",
+        "unknown type",
+        "cannot convert to map[string][]string",
+        "cannot convert to map[string]string",
+        "error parsing uint",
+        "error parsing bool",
+        "error parsing float",
+        "error parsing time",
+        "error loading time location",
+        "error parsing duration"
+      ],
+      "sideEffects": [
+        "mutation of input struct via reflection"
+      ],
+      "complexityScore": 146,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:23.6449203Z"
+    },
+    {
+      "componentName": "plain",
+      "path": "plain.go",
+      "blobSha": "a5af2489b69418e95196a5184c67a2526b100824",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component is responsible for binding data from HTTP requests or request bodies to Go objects, specifically using plain text format.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "plainBinding",
+          "signature": "func (plainBinding) Name() (string)",
+          "ref": {
+            "path": "plain.go",
+            "symbol": "plainBinding.Name",
+            "startLine": 14,
+            "endLine": 16
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "plainBinding",
+          "signature": "func (plainBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "plain.go",
+            "symbol": "plainBinding.Bind",
+            "startLine": 18,
+            "endLine": 25
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "plainBinding",
+          "signature": "func (plainBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "plain.go",
+            "symbol": "plainBinding.BindBody",
+            "startLine": 27,
+            "endLine": 29
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/gin-gonic/gin/internal/bytesconv",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "The Bind and BindBody methods interact with HTTP requests."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "decodePlain returns an error",
+        "Invalid request format",
+        "Binding to nil object",
+        "JSON decoding error",
+        "Unsupported data type for binding",
+        "Type assertion failure",
+        "Empty request body"
+      ],
+      "sideEffects": [
+        "Mutates the object passed as an argument for binding"
+      ],
+      "complexityScore": 10,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:24.2031262Z"
+    },
+    {
+      "componentName": "protobuf",
+      "path": "protobuf.go",
+      "blobSha": "7f5bafeec302d242b414fdcf34c198d72ec6f118",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component handles the binding of Protobuf messages to HTTP requests and bodies.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "protobufBinding",
+          "signature": "func (protobufBinding) Name() (string)",
+          "ref": {
+            "path": "protobuf.go",
+            "symbol": "protobufBinding.Name",
+            "startLine": 17,
+            "endLine": 19
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "protobufBinding",
+          "signature": "func (protobufBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "protobuf.go",
+            "symbol": "protobufBinding.Bind",
+            "startLine": 21,
+            "endLine": 27
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "protobufBinding",
+          "signature": "func (protobufBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "protobuf.go",
+            "symbol": "protobufBinding.BindBody",
+            "startLine": 29,
+            "endLine": 41
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 3,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "google.golang.org/protobuf/proto",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "proto.Unmarshal",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "Used for unmarshalling the Protobuf message from byte array."
+        },
+        {
+          "name": "http.Request.Body.Read",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "Used for reading the body of the HTTP request."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "Invalid Protobuf message",
+        "Failed to read HTTP request body",
+        "Failed to unmarshal Protobuf message"
+      ],
+      "sideEffects": [
+        "Mutation of input object with bound data"
+      ],
+      "complexityScore": 6,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:26.0122913Z"
+    },
+    {
+      "componentName": "query",
+      "path": "query.go",
+      "blobSha": "fa82455350e219330cafdaede4dfc052b6e279d2",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component is responsible for binding HTTP request parameters to an object.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "queryBinding",
+          "signature": "func (queryBinding) Name() (string)",
+          "ref": {
+            "path": "query.go",
+            "symbol": "queryBinding.Name",
+            "startLine": 11,
+            "endLine": 13
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "queryBinding",
+          "signature": "func (queryBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "query.go",
+            "symbol": "queryBinding.Bind",
+            "startLine": 15,
+            "endLine": 21
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "This method interacts with HTTP requests to bind parameters"
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "Request is nil",
+        "Failed to decode request body",
+        "Invalid object type"
+      ],
+      "sideEffects": [
+        "Mutates the obj parameter with bound data"
+      ],
+      "complexityScore": 3,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:26.7714306Z"
+    },
+    {
+      "componentName": "toml",
+      "path": "toml.go",
+      "blobSha": "09f2818b5572e659921d320411ab8ae0197881f6",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component is responsible for binding TOML data from HTTP requests or byte slices to specified objects using the tomlBinding type.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "tomlBinding",
+          "signature": "func (tomlBinding) Name() (string)",
+          "ref": {
+            "path": "toml.go",
+            "symbol": "tomlBinding.Name",
+            "startLine": 17,
+            "endLine": 19
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "tomlBinding",
+          "signature": "func (tomlBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "toml.go",
+            "symbol": "tomlBinding.Bind",
+            "startLine": 21,
+            "endLine": 23
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "tomlBinding",
+          "signature": "func (tomlBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "toml.go",
+            "symbol": "tomlBinding.BindBody",
+            "startLine": 25,
+            "endLine": 27
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/pelletier/go-toml/v2",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "github.com/pelletier/go-toml/v2.Unmarshal",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "This call is essential for decoding TOML data."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "decodeToml returns an error",
+        "Request body is invalid TOML",
+        "Decoding TOML fails",
+        "Binding object is nil or has wrong type"
+      ],
+      "sideEffects": [],
+      "complexityScore": 5,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:27.3880117Z"
+    },
+    {
+      "componentName": "uri",
+      "path": "uri.go",
+      "blobSha": "a571a32d18f574254d6548d1ae7d15441a230e45",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component binds URI parameters to an object and provides a method to return its name.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "uriBinding",
+          "signature": "func (uriBinding) Name() (string)",
+          "ref": {
+            "path": "uri.go",
+            "symbol": "uriBinding.Name",
+            "startLine": 9,
+            "endLine": 11
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "BindUri",
+          "kind": "method",
+          "receiver": "uriBinding",
+          "signature": "func (uriBinding) BindUri(m map[string][]string, obj any) (error)",
+          "ref": {
+            "path": "uri.go",
+            "symbol": "uriBinding.BindUri",
+            "startLine": 13,
+            "endLine": 18
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 2,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [],
+      "errorPaths": [
+        "BindUri returns an error",
+        "Invalid URI parameters",
+        "Object binding failure"
+      ],
+      "sideEffects": [
+        "Mutates the given object based on URI parameters"
+      ],
+      "complexityScore": 3,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:27.9353039Z"
+    },
+    {
+      "componentName": "xml",
+      "path": "xml.go",
+      "blobSha": "954a561ce1d23acd456ec204ece633977138ef59",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The xml.go file provides functionality for XML binding, allowing XML data to be bound to Go objects from HTTP requests or byte slices.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "xmlBinding",
+          "signature": "func (xmlBinding) Name() (string)",
+          "ref": {
+            "path": "xml.go",
+            "symbol": "xmlBinding.Name",
+            "startLine": 16,
+            "endLine": 18
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "xmlBinding",
+          "signature": "func (xmlBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "xml.go",
+            "symbol": "xmlBinding.Bind",
+            "startLine": 20,
+            "endLine": 22
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "xmlBinding",
+          "signature": "func (xmlBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "xml.go",
+            "symbol": "xmlBinding.BindBody",
+            "startLine": 24,
+            "endLine": 26
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "Bind method depends on HTTP requests to extract XML data."
+        },
+        {
+          "name": "xml.Unmarshal",
+          "language": "go",
+          "direct": false,
+          "requiresMock": false,
+          "reason": "Used to decode XML data."
+        },
+        {
+          "name": "io.Reader",
+          "language": "go",
+          "direct": false,
+          "requiresMock": false,
+          "reason": "Used in decodeXML for reading data."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "decodeXML returns an error",
+        "Malformed XML in request body",
+        "Unsupported XML structure for binding",
+        "IO errors during reading",
+        "Decoding errors"
+      ],
+      "sideEffects": [
+        "Mutates the output object passed to Bind or BindBody by populating it with data from XML"
+      ],
+      "complexityScore": 5,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:29.3009733Z"
+    },
+    {
+      "componentName": "yaml",
+      "path": "yaml.go",
+      "blobSha": "78779ac7c085b92106b85607ec1b2d1d6771e702",
+      "language": "go",
+      "depth": "type-resolved",
+      "responsibility": "The component is responsible for binding YAML data from HTTP requests or byte arrays to Go objects.",
+      "publicSymbols": [
+        {
+          "name": "Name",
+          "kind": "method",
+          "receiver": "yamlBinding",
+          "signature": "func (yamlBinding) Name() (string)",
+          "ref": {
+            "path": "yaml.go",
+            "symbol": "yamlBinding.Name",
+            "startLine": 17,
+            "endLine": 19
+          },
+          "exported": true,
+          "returnsError": false,
+          "branchCount": 1,
+          "parameterCount": 0
+        },
+        {
+          "name": "Bind",
+          "kind": "method",
+          "receiver": "yamlBinding",
+          "signature": "func (yamlBinding) Bind(req *http.Request, obj any) (error)",
+          "ref": {
+            "path": "yaml.go",
+            "symbol": "yamlBinding.Bind",
+            "startLine": 21,
+            "endLine": 23
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        },
+        {
+          "name": "BindBody",
+          "kind": "method",
+          "receiver": "yamlBinding",
+          "signature": "func (yamlBinding) BindBody(body []byte, obj any) (error)",
+          "ref": {
+            "path": "yaml.go",
+            "symbol": "yamlBinding.BindBody",
+            "startLine": 25,
+            "endLine": 27
+          },
+          "exported": true,
+          "returnsError": true,
+          "branchCount": 1,
+          "parameterCount": 2
+        }
+      ],
+      "externalCalls": [
+        {
+          "name": "github.com/goccy/go-yaml",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "third-party import"
+        },
+        {
+          "name": "http.Request",
+          "language": "go",
+          "direct": false,
+          "requiresMock": true,
+          "reason": "To simulate different request scenarios for binding."
+        },
+        {
+          "name": "go-yaml",
+          "language": "go",
+          "direct": false,
+          "requiresMock": false,
+          "reason": "To decode YAML data."
+        }
+      ],
+      "errorPaths": [
+        "Bind returns an error",
+        "BindBody returns an error",
+        "decodeYAML returns an error",
+        "Error reading request body",
+        "Error decoding YAML",
+        "Invalid request type",
+        "Nil object passed for binding"
+      ],
+      "sideEffects": [
+        "Mutates the object passed to Bind and BindBody with the decoded data."
+      ],
+      "complexityScore": 5,
+      "confidence": 0.9,
+      "analysedAt": "2026-08-31T07:53:30.1703582Z"
+    }
+  ]
+}

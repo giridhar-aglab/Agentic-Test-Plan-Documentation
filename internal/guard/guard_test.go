@@ -16,16 +16,16 @@ func call(toolName, arguments string) llm.ToolCall {
 func TestFingerprintIgnoresArgumentKeyOrder(t *testing.T) {
 	// Key order must not disguise a repeat, or the guard is trivially defeated
 	// by a model that shuffles its JSON.
-	first := call("repo.read_file", `{"path":"a.go","startLine":1}`)
-	second := call("repo.read_file", `{"startLine":1,"path":"a.go"}`)
+	first := call("repo_read_file", `{"path":"a.go","startLine":1}`)
+	second := call("repo_read_file", `{"startLine":1,"path":"a.go"}`)
 	if Fingerprint(first) != Fingerprint(second) {
 		t.Fatal("identical calls with reordered keys must share a fingerprint")
 	}
 }
 
 func TestFingerprintDistinguishesDifferentArguments(t *testing.T) {
-	if Fingerprint(call("repo.read_file", `{"path":"a.go"}`)) ==
-		Fingerprint(call("repo.read_file", `{"path":"b.go"}`)) {
+	if Fingerprint(call("repo_read_file", `{"path":"a.go"}`)) ==
+		Fingerprint(call("repo_read_file", `{"path":"b.go"}`)) {
 		t.Fatal("different arguments must not collide")
 	}
 }
@@ -33,7 +33,7 @@ func TestFingerprintDistinguishesDifferentArguments(t *testing.T) {
 func TestRepeatCallGuardGraduatesFromCacheToAdviceToStop(t *testing.T) {
 	repeatGuard := DefaultRepeatCallGuard() // cache at 2, advise at 3, terminate at 4
 	state := &State{AgentName: "analyst", StartedAt: time.Now()}
-	toolCall := call("repo.read_file", `{"path":"a.go"}`)
+	toolCall := call("repo_read_file", `{"path":"a.go"}`)
 	ctx := context.Background()
 
 	// First occurrence proceeds and its result is cached.
@@ -79,7 +79,7 @@ func TestRepeatCallGuardGraduatesFromCacheToAdviceToStop(t *testing.T) {
 func TestRepeatCallGuardDoesNotCacheErrors(t *testing.T) {
 	repeatGuard := DefaultRepeatCallGuard()
 	state := &State{AgentName: "analyst", StartedAt: time.Now()}
-	toolCall := call("repo.read_file", `{"path":"missing.go"}`)
+	toolCall := call("repo_read_file", `{"path":"missing.go"}`)
 	ctx := context.Background()
 
 	_ = repeatGuard.BeforeToolCall(ctx, state, toolCall)
@@ -181,13 +181,13 @@ func (scope fixedScope) Names() []string {
 }
 
 func TestScopeGuardBlocksOutOfScopeTool(t *testing.T) {
-	scopeGuard := NewScopeGuard(fixedScope{allowed: map[string]bool{"repo.tree": true}})
+	scopeGuard := NewScopeGuard(fixedScope{allowed: map[string]bool{"repo_tree": true}})
 	state := &State{AgentName: "surveyor", StartedAt: time.Now()}
 
-	if err := scopeGuard.BeforeToolCall(context.Background(), state, call("repo.tree", `{}`)); err != nil {
+	if err := scopeGuard.BeforeToolCall(context.Background(), state, call("repo_tree", `{}`)); err != nil {
 		t.Fatalf("an in-scope tool must be allowed, got %v", err)
 	}
-	err := scopeGuard.BeforeToolCall(context.Background(), state, call("jira.push", `{}`))
+	err := scopeGuard.BeforeToolCall(context.Background(), state, call("jira_push", `{}`))
 	stop, isStop := IsStop(err)
 	if !isStop || stop.Reason != StopOutOfScope {
 		t.Fatalf("expected an out-of-scope stop, got %v", err)

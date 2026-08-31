@@ -6,12 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/giri-ms19/testplan-agent/internal/guard"
 	"github.com/giri-ms19/testplan-agent/internal/llm"
 	"github.com/giri-ms19/testplan-agent/internal/memory"
 	"github.com/giri-ms19/testplan-agent/internal/tool"
+	contexttool "github.com/giri-ms19/testplan-agent/internal/tool/context"
 )
 
 // Task is what an agent is asked to do. It is deliberately small: an agent's
@@ -32,6 +35,32 @@ type Outcome struct {
 	TokensUsed     int
 	StoppedBy      *guard.Stop
 	Duration       time.Duration
+	// CallCounts records how often each tool was called. When a guard stops a
+	// loop, "reached 8 iterations" alone says nothing about why; the histogram
+	// is the difference between a diagnosis and another round of guessing.
+	CallCounts map[string]int
+}
+
+// CallSummary renders the histogram for a log line, busiest tool first.
+func (outcome Outcome) CallSummary() string {
+	if len(outcome.CallCounts) == 0 {
+		return "no tool calls"
+	}
+	toolNames := make([]string, 0, len(outcome.CallCounts))
+	for toolName := range outcome.CallCounts {
+		toolNames = append(toolNames, toolName)
+	}
+	sort.Slice(toolNames, func(left, right int) bool {
+		if outcome.CallCounts[toolNames[left]] != outcome.CallCounts[toolNames[right]] {
+			return outcome.CallCounts[toolNames[left]] > outcome.CallCounts[toolNames[right]]
+		}
+		return toolNames[left] < toolNames[right]
+	})
+	parts := make([]string, 0, len(toolNames))
+	for _, toolName := range toolNames {
+		parts = append(parts, fmt.Sprintf("%s×%d", toolName, outcome.CallCounts[toolName]))
+	}
+	return strings.Join(parts, ", ")
 }
 
 // Completed reports whether the loop ended on its own terms rather than being
@@ -50,6 +79,11 @@ type Loop struct {
 
 	// SpillThresholdBytes is the payload size above which a tool result is
 	// stored by handle and replaced in context by a digest.
+	//
+	// This has to be generous. A source file the agent was told to analyse is
+	// the whole point of the invocation; digesting it forces the model to spend
+	// turns getting back what it just asked for. Spilling is for the outliers —
+	// a repository listing, a giant generated file — not for ordinary reads.
 	SpillThresholdBytes int
 	// MaxOutputTokens caps a single completion.
 	MaxOutputTokens int
@@ -62,11 +96,19 @@ type Loop struct {
 
 // NewLoop builds a loop with sensible defaults.
 func NewLoop(provider llm.Provider, registry *tool.Registry, blackboard *memory.Blackboard, guards guard.Chain) *Loop {
-	return &Loop{
+	spillStore := memory.NewSpillStore()
+	loop := &Loop{
 		Provider: provider, Registry: registry, Blackboard: blackboard, Guards: guards,
-		SpillStore: memory.NewSpillStore(), SpillThresholdBytes: 4000,
+		SpillStore: spillStore, SpillThresholdBytes: 48000,
 		MaxOutputTokens: 2000, nowFunc: time.Now,
 	}
+	// Registered here rather than by each agent, so the digest's instruction
+	// and the tool that carries it out cannot drift apart: any loop that can
+	// spill can also fetch.
+	if registry != nil {
+		registry.Register(&contexttool.FetchTool{Store: spillStore, MaxCharacters: 24000}, tool.LocalPolicy())
+	}
+	return loop
 }
 
 // Run executes the bounded iteration loop.
@@ -84,7 +126,7 @@ func (loop *Loop) Run(ctx context.Context, task Task) (Outcome, error) {
 		BlackboardRevision: loop.Blackboard.Revision(),
 		StartedAt:          loop.nowFunc(),
 	}
-	outcome := Outcome{AgentName: task.AgentName}
+	outcome := Outcome{AgentName: task.AgentName, CallCounts: map[string]int{}}
 
 	for {
 		loopState.BlackboardRevision = loop.Blackboard.Revision()
@@ -126,6 +168,7 @@ func (loop *Loop) Run(ctx context.Context, task Task) (Outcome, error) {
 				return loop.finish(outcome, loopState, err)
 			}
 
+			outcome.CallCounts[toolCall.ToolName]++
 			toolResult := loop.invokeOne(ctx, loopState, toolCall)
 			toolResults = append(toolResults, toolResult)
 			loopState.ToolCallCount++

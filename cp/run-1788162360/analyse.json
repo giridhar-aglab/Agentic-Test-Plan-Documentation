@@ -1,0 +1,1697 @@
+{
+  "runId": "run-1788162360",
+  "startedAt": "2026-08-31T07:46:00.2402257Z",
+  "revision": 18,
+  "repoMap": {
+    "repositoryName": "gin/binding",
+    "commitSha": "",
+    "languages": [
+      "go"
+    ],
+    "files": [
+      {
+        "path": "binding.go",
+        "blobSha": "62b8c94aebc672ca5d1491688e51587e7d4eacd0",
+        "sizeBytes": 4421,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "binding_msgpack_test.go",
+        "blobSha": "7578a58c6cea623d61b7eb05233ef6dc6599f79f",
+        "sizeBytes": 1482,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "binding_nomsgpack.go",
+        "blobSha": "6d651b52ba044de6372235649ad7daec694dfc69",
+        "sizeBytes": 3943,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "binding_test.go",
+        "blobSha": "d51d29feee141a3420498d4d809cfcdad967f6b6",
+        "sizeBytes": 40952,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "bson.go",
+        "blobSha": "d1e9af2ba362d620064e380b17295a164048a53c",
+        "sizeBytes": 610,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "default_validator.go",
+        "blobSha": "6f328d46b1ea682ccb83445f516aa621a7734aca",
+        "sizeBytes": 2440,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "default_validator_benchmark_test.go",
+        "blobSha": "140940388c070740ceaab6371d98c1714f959319",
+        "sizeBytes": 521,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "default_validator_test.go",
+        "blobSha": "003be127999e27e88aac7a07bf5b031fd3b794a8",
+        "sizeBytes": 3681,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "form.go",
+        "blobSha": "a4f967daf13810609775262ce892f3c0ea16e8a8",
+        "sizeBytes": 1421,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "form_mapping.go",
+        "blobSha": "410d3d2e2f8967161c113a5cd75fcf21194697f1",
+        "sizeBytes": 14152,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "form_mapping_benchmark_test.go",
+        "blobSha": "f030961770a29aa7e6645f66cf52adf4bbf44e33",
+        "sizeBytes": 1535,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "form_mapping_test.go",
+        "blobSha": "132468cf7876fc78be8bd357b06481b73fa7eba1",
+        "sizeBytes": 35298,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "header.go",
+        "blobSha": "123a8e5b9f269ebdbc78911057f949245eb956d5",
+        "sizeBytes": 905,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "json.go",
+        "blobSha": "c74d4a84f62634e8a39ca38e77797c22c83ccced",
+        "sizeBytes": 1599,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "json_test.go",
+        "blobSha": "d64845b939a0a3088e24114272945473a70e3547",
+        "sizeBytes": 5740,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "msgpack.go",
+        "blobSha": "cd7064275775b8d676ae6786d318066778664745",
+        "sizeBytes": 805,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "msgpack_test.go",
+        "blobSha": "ada35e46f257d5dd28e50b4c640786d04831f299",
+        "sizeBytes": 819,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "multipart_form_mapping.go",
+        "blobSha": "33d33adc18225bbda241b21a646ac5e4b0fa8aeb",
+        "sizeBytes": 2318,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "blobSha": "843c9627b3c7f86dc6e30a0254e70517c81c640e",
+        "sizeBytes": 3933,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "plain.go",
+        "blobSha": "a5af2489b69418e95196a5184c67a2526b100824",
+        "sizeBytes": 924,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "protobuf.go",
+        "blobSha": "7f5bafeec302d242b414fdcf34c198d72ec6f118",
+        "sizeBytes": 964,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "query.go",
+        "blobSha": "fa82455350e219330cafdaede4dfc052b6e279d2",
+        "sizeBytes": 481,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "toml.go",
+        "blobSha": "09f2818b5572e659921d320411ab8ae0197881f6",
+        "sizeBytes": 733,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "toml_test.go",
+        "blobSha": "8489b8ef318d9a86f6c370a20b773e167beb1a9c",
+        "sizeBytes": 525,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "uri.go",
+        "blobSha": "a571a32d18f574254d6548d1ae7d15441a230e45",
+        "sizeBytes": 417,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "validate_test.go",
+        "blobSha": "3b709904144bd9f40137181ff0602a196f10e618",
+        "sizeBytes": 6378,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "xml.go",
+        "blobSha": "954a561ce1d23acd456ec204ece633977138ef59",
+        "sizeBytes": 711,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "xml_test.go",
+        "blobSha": "aabfb5bd7ccb6bf0690dfb63327dba6a7e06bf8a",
+        "sizeBytes": 585,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      },
+      {
+        "path": "yaml.go",
+        "blobSha": "78779ac7c085b92106b85607ec1b2d1d6771e702",
+        "sizeBytes": 726,
+        "language": "go",
+        "isTest": false,
+        "isGenerated": false,
+        "isVendored": false,
+        "selectedForScan": true
+      },
+      {
+        "path": "yaml_test.go",
+        "blobSha": "8dcd97ef84ce154b37def0ed010e3d86bce57fef",
+        "sizeBytes": 501,
+        "language": "go",
+        "isTest": true,
+        "isGenerated": false,
+        "isVendored": false,
+        "excludedReason": "test file",
+        "selectedForScan": false
+      }
+    ],
+    "dependencies": null,
+    "existingTests": [
+      {
+        "path": "binding_msgpack_test.go",
+        "testName": "TestBindingMsgPack",
+        "coversRef": {
+          "path": "binding_msgpack.go",
+          "symbol": "BindingMsgPack"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_msgpack_test.go",
+        "testName": "TestBindingDefaultMsgPack",
+        "coversRef": {
+          "path": "binding_msgpack.go",
+          "symbol": "BindingDefaultMsgPack"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingDefault",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONNilBody",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONNilBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSON",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSON"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONSlice",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONSlice"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONUseNumber",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONUseNumber"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONUseNumber2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONUseNumber2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONDisallowUnknownFields",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONDisallowUnknownFields"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingJSONStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingJSONStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingForm",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingForm2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingForm2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormEmbeddedStruct",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormEmbeddedStruct"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormEmbeddedStruct2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormEmbeddedStruct2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormDefaultValue",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormDefaultValue"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormDefaultValue2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormDefaultValue2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormForTime",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormForTime"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormForTime2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormForTime2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormBindingIgnoreField",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormBindingIgnoreField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormInvalidName",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormInvalidName"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormInvalidName2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormInvalidName2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormForType",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormForType"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormStringSliceMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormStringSliceMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQuery",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQuery"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQuery2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQuery2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryFail2",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryFail2"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryBoolFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryBoolFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingQueryStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingQueryStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingXML",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingXML"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingXMLFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingXMLFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingTOML",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingTOML"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingTOMLFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingTOMLFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingYAML",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingYAML"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingYAMLStringMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingYAMLStringMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingYAMLFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingYAMLFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormPost",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormPost"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingDefaultValueFormPost",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingDefaultValueFormPost"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormPostForMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormPostForMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormPostForMapFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormPostForMapFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormFilesMultipart",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormFilesMultipart"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormFilesMultipartFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormFilesMultipartFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormMultipart",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormMultipart"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormMultipartForMap",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormMultipartForMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingFormMultipartForMapFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingFormMultipartForMapFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingProtoBuf",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingProtoBuf"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingProtoBufFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingProtoBufFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestBindingBSON",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "BindingBSON"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestValidationFails",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "ValidationFails"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestValidationDisabled",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "ValidationDisabled"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestRequiredSucceeds",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "RequiredSucceeds"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestRequiredFails",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "RequiredFails"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestHeaderBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "HeaderBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestUriBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "UriBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestUriInnerBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "UriInnerBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormBindingFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormBindingFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormBindingMultipartFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormBindingMultipartFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormPostBindingFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormPostBindingFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestFormMultipartBindingFail",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "FormMultipartBindingFail"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "binding_test.go",
+        "testName": "TestPlainBinding",
+        "coversRef": {
+          "path": "binding.go",
+          "symbol": "PlainBinding"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "default_validator_test.go",
+        "testName": "TestSliceValidationError",
+        "coversRef": {
+          "path": "default_validator.go",
+          "symbol": "SliceValidationError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "default_validator_test.go",
+        "testName": "TestDefaultValidator",
+        "coversRef": {
+          "path": "default_validator.go",
+          "symbol": "DefaultValidator"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingBaseTypes",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingBaseTypes"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingSkipField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingSkipField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingIgnoreField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingIgnoreField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUnexportedField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUnexportedField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingPrivateField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingPrivateField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUnknownFieldType",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUnknownFieldType"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingURI",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingURI"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingFormFieldNotSent",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingFormFieldNotSent"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingFormWithEmptyToDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingFormWithEmptyToDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMapFormWithTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MapFormWithTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingTime",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingTime"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingTimeUnixNano",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingTimeUnixNano"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingTimeDuration",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingTimeDuration"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingSlice",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingSlice"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingArray",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingArray"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCollectionFormat",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCollectionFormat"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCollectionFormatInvalid",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCollectionFormatInvalid"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingMultipleDefaultWithCollectionFormat",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingMultipleDefaultWithCollectionFormat"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingStructField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingStructField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingPtrField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingPtrField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingMapField",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingMapField"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingIgnoredCircularRef",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingIgnoredCircularRef"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalParamHexWithFormTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalParamHexWithFormTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalParamHexWithURITag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalParamHexWithURITag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalParamHexDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalParamHexDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeWithFormTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeWithFormTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeWithURITag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeWithURITag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeWithFormTag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeWithFormTag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeWithURITag",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeWithURITag"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceStopsWhenError",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceStopsWhenError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalTextHexUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalTextHexUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalTextHexForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalTextHexForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomUnmarshalTextHexDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomUnmarshalTextHexDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomStructTypeUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomStructTypeUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomPointerStructTypeUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomPointerStructTypeUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceUnmarshalTextStopsWhenError",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceUnmarshalTextStopsWhenError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomSliceOfSliceUnmarshalTextDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomSliceOfSliceUnmarshalTextDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUnmarshalTextUri",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUnmarshalTextUri"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUnmarshalTextForm",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUnmarshalTextForm"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingCustomArrayOfArrayUnmarshalTextDefault",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingCustomArrayOfArrayUnmarshalTextDefault"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyBindUnmarshalerDefined",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyBindUnmarshalerDefined"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyTextUnmarshalerDefined",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUsingBindUnmarshalerAndTextUnmarshalerWhenOnlyTextUnmarshalerDefined"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingUsingTextUnmarshalerWhenBindUnmarshalerAlsoDefined",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingUsingTextUnmarshalerWhenBindUnmarshalerAlsoDefined"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "form_mapping_test.go",
+        "testName": "TestMappingEmptyValues",
+        "coversRef": {
+          "path": "form_mapping.go",
+          "symbol": "MappingEmptyValues"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "json_test.go",
+        "testName": "TestJSONBindingBindBody",
+        "coversRef": {
+          "path": "json.go",
+          "symbol": "JSONBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "json_test.go",
+        "testName": "TestJSONBindingBindBodyMap",
+        "coversRef": {
+          "path": "json.go",
+          "symbol": "JSONBindingBindBodyMap"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "json_test.go",
+        "testName": "TestCustomJsonCodec",
+        "coversRef": {
+          "path": "json.go",
+          "symbol": "CustomJsonCodec"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "msgpack_test.go",
+        "testName": "TestMsgpackBindingBindBody",
+        "coversRef": {
+          "path": "msgpack.go",
+          "symbol": "MsgpackBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "testName": "TestFormMultipartBindingBindOneFile",
+        "coversRef": {
+          "path": "multipart_form_mapping.go",
+          "symbol": "FormMultipartBindingBindOneFile"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "testName": "TestFormMultipartBindingBindTwoFiles",
+        "coversRef": {
+          "path": "multipart_form_mapping.go",
+          "symbol": "FormMultipartBindingBindTwoFiles"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "multipart_form_mapping_test.go",
+        "testName": "TestFormMultipartBindingBindError",
+        "coversRef": {
+          "path": "multipart_form_mapping.go",
+          "symbol": "FormMultipartBindingBindError"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "toml_test.go",
+        "testName": "TestTOMLBindingBindBody",
+        "coversRef": {
+          "path": "toml.go",
+          "symbol": "TOMLBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidateNoValidationValues",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidateNoValidationValues"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidateNoValidationPointers",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidateNoValidationPointers"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidatePrimitives",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidatePrimitives"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidateAndModifyStruct",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidateAndModifyStruct"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "validate_test.go",
+        "testName": "TestValidatorEngine",
+        "coversRef": {
+          "path": "validate.go",
+          "symbol": "ValidatorEngine"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "xml_test.go",
+        "testName": "TestXMLBindingBindBody",
+        "coversRef": {
+          "path": "xml.go",
+          "symbol": "XMLBindingBindBody"
+        },
+        "matchedByAst": true
+      },
+      {
+        "path": "yaml_test.go",
+        "testName": "TestYAMLBindingBindBody",
+        "coversRef": {
+          "path": "yaml.go",
+          "symbol": "YAMLBindingBindBody"
+        },
+        "matchedByAst": true
+      }
+    ],
+    "entrypoints": null,
+    "testFrameworkName": "go test",
+    "surveyedAt": "2026-08-31T07:46:00.2438954Z"
+  },
+  "gaps": [
+    {
+      "phase": "analyst",
+      "subject": "default_validator.go",
+      "reason": "analysis failed: agent analyst:default_validator.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:02.2575314Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "binding.go",
+      "reason": "analysis failed: agent analyst:binding.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:02.2575314Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "bson.go",
+      "reason": "analysis failed: agent analyst:bson.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:02.2754378Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "binding_nomsgpack.go",
+      "reason": "analysis failed: agent analyst:binding_nomsgpack.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:02.6920035Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "form.go",
+      "reason": "analysis failed: agent analyst:form.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:03.0649568Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "form_mapping.go",
+      "reason": "analysis failed: agent analyst:form_mapping.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:03.0649568Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "json.go",
+      "reason": "analysis failed: agent analyst:json.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:03.4831672Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "msgpack.go",
+      "reason": "analysis failed: agent analyst:msgpack.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:03.4831672Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "protobuf.go",
+      "reason": "analysis failed: agent analyst:protobuf.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:03.8321809Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "multipart_form_mapping.go",
+      "reason": "analysis failed: agent analyst:multipart_form_mapping.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:03.8423055Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "toml.go",
+      "reason": "analysis failed: agent analyst:toml.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.274561Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "query.go",
+      "reason": "analysis failed: agent analyst:query.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.274561Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "plain.go",
+      "reason": "analysis failed: agent analyst:plain.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.274561Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "header.go",
+      "reason": "analysis failed: agent analyst:header.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.274561Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "xml.go",
+      "reason": "analysis failed: agent analyst:xml.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.8873364Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "yaml.go",
+      "reason": "analysis failed: agent analyst:yaml.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.8878498Z"
+    },
+    {
+      "phase": "analyst",
+      "subject": "uri.go",
+      "reason": "analysis failed: agent analyst:uri.go: completion: openai-compatible: 400: Invalid 'tools[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'.",
+      "notedAt": "2026-08-31T07:46:04.8878498Z"
+    }
+  ]
+}

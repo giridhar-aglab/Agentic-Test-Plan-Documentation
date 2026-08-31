@@ -45,9 +45,36 @@ type RiskThresholds struct {
 	Medium   float64
 }
 
-// DefaultRiskThresholds is the shipped banding.
+// DefaultRiskThresholds is the shipped banding, used only for repositories too
+// small for percentile banding to mean anything.
 func DefaultRiskThresholds() RiskThresholds {
 	return RiskThresholds{Critical: 30, High: 18, Medium: 8}
+}
+
+// RiskBands set how much of a repository lands in each level.
+//
+// Absolute thresholds were tuned on a three-file fixture, and on a real
+// repository they called 42 of 58 components critical or high. Prioritisation
+// that selects 72% of a codebase is not prioritisation — it is a list. Bands
+// are therefore relative to this repository's own distribution: the score
+// stays absolute and comparable between runs, while the level answers "how
+// does this component rank against its neighbours", which is the question a
+// reviewer deciding where to start is actually asking.
+type RiskBands struct {
+	CriticalFraction float64
+	HighFraction     float64
+	MediumFraction   float64
+	// MinimumComponents is the size below which percentiles are meaningless
+	// and the absolute thresholds are used instead.
+	MinimumComponents int
+}
+
+// DefaultRiskBands puts the top tenth in critical and the next fifth in high.
+func DefaultRiskBands() RiskBands {
+	return RiskBands{
+		CriticalFraction: 0.10, HighFraction: 0.20, MediumFraction: 0.35,
+		MinimumComponents: 8,
+	}
 }
 
 // RiskScorer builds the prioritised register.
@@ -59,11 +86,15 @@ func DefaultRiskThresholds() RiskThresholds {
 type RiskScorer struct {
 	Weights    RiskWeights
 	Thresholds RiskThresholds
+	Bands      RiskBands
 }
 
 // NewRiskScorer builds a scorer with the shipped defaults.
 func NewRiskScorer() *RiskScorer {
-	return &RiskScorer{Weights: DefaultRiskWeights(), Thresholds: DefaultRiskThresholds()}
+	return &RiskScorer{
+		Weights: DefaultRiskWeights(), Thresholds: DefaultRiskThresholds(),
+		Bands: DefaultRiskBands(),
+	}
 }
 
 func (riskScorer *RiskScorer) Name() string { return "risk" }
@@ -88,13 +119,16 @@ func (riskScorer *RiskScorer) Score(blackboard *memory.Blackboard) error {
 		}
 		return risks[leftIndex].ID < risks[rightIndex].ID
 	})
+	riskScorer.assignLevels(risks)
 
 	blackboard.SetRiskRegister(model.RiskRegister{
 		Risks:    risks,
 		ScoredAt: time.Now().UTC(),
 		ScoringNote: fmt.Sprintf(
 			"Deterministic scoring: branches ×%.1f, error paths ×%.1f, external calls ×%.1f, "+
-				"side effects ×%.1f, exported symbols ×%.1f; ×%.1f when untested, ×%.2f when analysis was syntactic only.",
+				"side effects ×%.1f, exported symbols ×%.1f; ×%.1f when untested, ×%.2f when analysis was syntactic only. "+
+				"Scores are absolute and comparable between runs; levels are relative to this repository "+
+				"(top 10%% critical, next 20%% high, next 35%% medium).",
 			riskScorer.Weights.PerBranch, riskScorer.Weights.PerErrorPath,
 			riskScorer.Weights.PerExternalCall, riskScorer.Weights.PerSideEffect,
 			riskScorer.Weights.PerExportedSymbol,
@@ -158,10 +192,12 @@ func (riskScorer *RiskScorer) scoreComponent(componentModel model.ComponentModel
 	}
 
 	return model.Risk{
-		ID:              riskIDFor(componentModel),
-		ComponentName:   componentModel.ComponentName,
-		Ref:             riskAnchorFor(componentModel),
-		Level:           riskScorer.levelFor(score),
+		ID:            riskIDFor(componentModel),
+		ComponentName: componentModel.ComponentName,
+		Ref:           riskAnchorFor(componentModel),
+		// Level is assigned once the whole distribution is known; see
+		// assignLevels.
+		Level:           model.RiskLow,
 		Score:           roundToOneDecimal(score),
 		Rationale:       rationaleFor(componentModel, hasExistingTest),
 		Signals:         signals,
@@ -220,6 +256,61 @@ func rationaleFor(componentModel model.ComponentModel, hasExistingTest bool) str
 	}
 	rationaleBuilder.WriteString(".")
 	return rationaleBuilder.String()
+}
+
+// assignLevels bands an already-sorted register by rank.
+//
+// Ties are honoured: two components with the same score always get the same
+// level, so a band boundary never splits equal risks arbitrarily.
+func (riskScorer *RiskScorer) assignLevels(risks []model.Risk) {
+	bands := riskScorer.Bands
+	if bands.MinimumComponents <= 0 {
+		bands = DefaultRiskBands()
+	}
+	if len(risks) < bands.MinimumComponents {
+		// Too few components for a percentile to mean anything. Fall back to
+		// the absolute thresholds rather than calling the top file of four
+		// "critical" purely because something has to be.
+		for index := range risks {
+			risks[index].Level = riskScorer.levelFor(risks[index].Score)
+		}
+		return
+	}
+
+	criticalCount := atLeastOne(float64(len(risks)) * bands.CriticalFraction)
+	highCount := criticalCount + atLeastOne(float64(len(risks))*bands.HighFraction)
+	mediumCount := highCount + atLeastOne(float64(len(risks))*bands.MediumFraction)
+
+	levelForRank := func(rank int) model.RiskLevel {
+		switch {
+		case rank < criticalCount:
+			return model.RiskCritical
+		case rank < highCount:
+			return model.RiskHigh
+		case rank < mediumCount:
+			return model.RiskMedium
+		default:
+			return model.RiskLow
+		}
+	}
+
+	for index := range risks {
+		level := levelForRank(index)
+		// Equal scores must not straddle a boundary: promote to whatever the
+		// first component with this score received.
+		if index > 0 && risks[index].Score == risks[index-1].Score {
+			level = risks[index-1].Level
+		}
+		risks[index].Level = level
+	}
+}
+
+func atLeastOne(value float64) int {
+	rounded := int(value + 0.5)
+	if rounded < 1 {
+		return 1
+	}
+	return rounded
 }
 
 func (riskScorer *RiskScorer) levelFor(score float64) model.RiskLevel {

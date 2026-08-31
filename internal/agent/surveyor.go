@@ -333,6 +333,6 @@ func buildSurveyInstruction(repoMap model.RepoMap) string {
 	for _, sourceFile := range repoMap.SelectedFiles() {
 		fmt.Fprintf(&instructionBuilder, "  %s\n", sourceFile.Path)
 	}
-	instructionBuilder.WriteString("\nUse repo.read_file or code.parse_go if you need detail before answering.")
+	instructionBuilder.WriteString("\nUse repo_read_file or code_parse_go if you need detail before answering.")
 	return instructionBuilder.String()
 }

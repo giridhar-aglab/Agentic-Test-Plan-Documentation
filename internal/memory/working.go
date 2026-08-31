@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 
@@ -45,6 +46,19 @@ func (spillStore *SpillStore) Get(handle string) (string, bool) {
 	return payload, found
 }
 
+// Handles lists what the store currently holds, so a tool refusing an unknown
+// handle can name the real ones instead of leaving the model to guess.
+func (spillStore *SpillStore) Handles() []string {
+	spillStore.mutex.RLock()
+	defer spillStore.mutex.RUnlock()
+	handles := make([]string, 0, len(spillStore.payloadsByHandle))
+	for handle := range spillStore.payloadsByHandle {
+		handles = append(handles, handle)
+	}
+	sort.Strings(handles)
+	return handles
+}
+
 // Digest returns a short summary of a payload, used in place of the payload
 // itself once it has been spilled.
 func Digest(payload string, maxCharacters int) string {
@@ -53,7 +67,12 @@ func Digest(payload string, maxCharacters int) string {
 		return trimmedPayload
 	}
 	lineCount := strings.Count(trimmedPayload, "\n") + 1
-	return fmt.Sprintf("%s\n… (%d lines, %d bytes total; fetch the rest by handle)",
+	// The instruction has to name the tool that carries it out. An earlier
+	// version said "fetch the rest by handle" while no such tool existed, and
+	// a model told to retrieve something it cannot retrieve just retries the
+	// call that produced it.
+	return fmt.Sprintf("%s\n… (%d lines, %d bytes total; call context_fetch with the handle below "+
+		"to read the rest — do not repeat the call that produced this)",
 		trimmedPayload[:maxCharacters], lineCount, len(trimmedPayload))
 }
 

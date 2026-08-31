@@ -1,0 +1,112 @@
+# Test Plan — paymentsvc
+
+## Summary
+
+- **3 scenarios**. No risk scored critical or high; scenarios cover the highest-scoring components.
+- Priority mix: 2 P2, 1 P3
+- Structural validation passed: every scenario has steps, a checkable expected result, and a source reference that resolves in this commit
+- **Review these first** — 3 scenarios the system is least confident about: `TS-gateway-gateway-001`, `TS-ledger-ledger-001`, `TS-paysvc-main-001`
+- 2 gaps recorded; see the end of this document
+
+## Run metadata
+
+- Run: `run-1788159881`
+- Commit: `working tree`
+- Languages: go
+- Test framework: testify
+- Analysis depth: 3 syntactic
+
+## Scope
+
+5 files in the commit, 3 selected for analysis.
+
+| File | Language | Size |
+|---|---|---|
+| `cmd/paysvc/main.go` | go | 111 B |
+| `internal/gateway/gateway.go` | go | 1311 B |
+| `internal/ledger/ledger.go` | go | 1604 B |
+
+**Excluded:** 1 test file, 1 unsupported language.
+
+**Existing tests:** 1 found — `TestBalance`.
+
+**Dependencies:** 1 direct, 2 total.
+
+## Test considerations
+
+### Risk register
+
+| Risk | Component | Level | Score | Existing tests | Why |
+|---|---|---|---|---|---|
+| `RISK-gateway-gateway` | gateway/gateway | **medium** | 15.5 | none | gateway/gateway has 7 branches across 4 exported symbols and 1 distinct failure paths, with no tests in its package. |
+| `RISK-ledger-ledger` | ledger/ledger | **medium** | 12.4 | some | ledger/ledger has 12 branches across 4 exported symbols and 1 distinct failure paths. |
+| `RISK-paysvc-main` | paysvc/main | **low** | 1.4 | none | paysvc/main has 1 branches across 0 exported symbols, with no tests in its package. |
+
+_Deterministic scoring: branches ×1.0, error paths ×2.5, external calls ×2.0, side effects ×2.0, exported symbols ×0.5; ×1.8 when untested, ×0.75 when analysis was syntactic only._
+
+## Scenario catalogue
+
+### gateway/gateway
+
+#### `TS-gateway-gateway-001` — Exercise every failure path of Capture
+
+**P2** · negative · covers `RISK-gateway-gateway` · `Capture` in internal/gateway/gateway.go
+
+*Steps:*
+
+1. Call Capture once for each failure path listed in the analysis
+2. Record the returned error for each
+
+*Expected:* Each failure path returns its own distinct, identifiable error.
+
+*Note:* Generated without a model. This is a placeholder for a real scenario, not a substitute for one.
+
+> Low confidence (0.3) — worth a close read.
+
+### ledger/ledger
+
+#### `TS-ledger-ledger-001` — Exercise every failure path of Post
+
+**P2** · negative · covers `RISK-ledger-ledger` · `Post` in internal/ledger/ledger.go
+
+*Steps:*
+
+1. Call Post once for each failure path listed in the analysis
+2. Record the returned error for each
+
+*Expected:* Each failure path returns its own distinct, identifiable error.
+
+*Note:* Generated without a model. This is a placeholder for a real scenario, not a substitute for one.
+
+> Low confidence (0.3) — worth a close read.
+
+### paysvc/main
+
+#### `TS-paysvc-main-001` — Exercise every failure path of paysvc/main
+
+**P3** · negative · covers `RISK-paysvc-main` · `cmd/paysvc/main.go`
+
+*Steps:*
+
+1. Call paysvc/main once for each failure path listed in the analysis
+2. Record the returned error for each
+
+*Expected:* Each failure path returns its own distinct, identifiable error.
+
+*Note:* Generated without a model. This is a placeholder for a real scenario, not a substitute for one.
+
+> Low confidence (0.3) — worth a close read.
+
+## Traceability
+
+| Scenario | Symbol | Risk | Priority |
+|---|---|---|---|
+| `TS-gateway-gateway-001` | `Capture` | `RISK-gateway-gateway` | P2 |
+| `TS-ledger-ledger-001` | `Post` | `RISK-ledger-ledger` | P2 |
+| `TS-paysvc-main-001` | `cmd/paysvc/main.go` | `RISK-paysvc-main` | P3 |
+
+## Gaps
+
+- **author** — `scenarios`: no model provider was configured; scenarios are structural placeholders only
+- **approval** — `verdict`: awaiting human approval; no scenario has been published
+

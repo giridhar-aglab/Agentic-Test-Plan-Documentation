@@ -29,7 +29,7 @@ type ComponentTool struct {
 	Base model.ComponentModel
 }
 
-func (componentTool *ComponentTool) Name() string { return "analysis.emit_component" }
+func (componentTool *ComponentTool) Name() string { return "analysis_emit_component" }
 
 func (componentTool *ComponentTool) Description() string {
 	return "Record your analysis of the component you were asked to read. Call this exactly once, " +
@@ -151,7 +151,7 @@ type ScenarioTool struct {
 	emittedCount int
 }
 
-func (scenarioTool *ScenarioTool) Name() string { return "scenario.emit" }
+func (scenarioTool *ScenarioTool) Name() string { return "scenario_emit" }
 
 func (scenarioTool *ScenarioTool) Description() string {
 	return "Record one or more test scenarios for the risk you were given. Call this once with " +
@@ -236,9 +236,18 @@ func (scenarioTool *ScenarioTool) Invoke(ctx context.Context, arguments json.Raw
 			mocks = append(mocks, model.Dependency{Name: mockName, RequiresMock: true})
 		}
 
+		// When the model names a symbol, take that symbol's own line from the
+		// parser. Keeping the risk anchor's line while swapping the symbol name
+		// produces a link that says one function and points at another — and
+		// when the anchor had no line at all, at nothing.
 		sourceRef := scenarioTool.Risk.Ref
 		if incoming.Symbol != "" {
 			sourceRef.Symbol = incoming.Symbol
+			if resolved, found := resolveSymbolRef(
+				scenarioTool.Blackboard, scenarioTool.Risk.ComponentName, incoming.Symbol,
+			); found {
+				sourceRef = resolved
+			}
 		}
 
 		scenarios = append(scenarios, model.TestScenario{
@@ -263,6 +272,41 @@ func (scenarioTool *ScenarioTool) Invoke(ctx context.Context, arguments json.Raw
 	scenarioTool.Blackboard.AddScenarios(scenarios...)
 	return tool.Text(fmt.Sprintf("Recorded %d scenarios for risk %s. You are done; stop now.",
 		len(scenarios), scenarioTool.Risk.ID), tool.Internal()), nil
+}
+
+// resolveSymbolRef finds a named symbol's location in the analysed component,
+// so a scenario's link lands on the function it is actually about.
+func resolveSymbolRef(
+	blackboard *memory.Blackboard, componentName, symbolName string,
+) (model.SourceRef, bool) {
+	if blackboard == nil || symbolName == "" {
+		return model.SourceRef{}, false
+	}
+	// A model may write "Type.Method" where the parser recorded "Method".
+	bareName := symbolName
+	if lastDot := strings.LastIndex(symbolName, "."); lastDot >= 0 {
+		bareName = symbolName[lastDot+1:]
+	}
+
+	for _, componentModel := range blackboard.ComponentModels() {
+		if componentModel.ComponentName != componentName {
+			continue
+		}
+		for _, symbol := range componentModel.PublicSymbols {
+			if symbol.Name != symbolName && symbol.Name != bareName {
+				continue
+			}
+			if symbol.Ref.StartLine == 0 {
+				continue
+			}
+			resolved := symbol.Ref
+			// Keep the name the model used; it is what the reader will search
+			// for, and it may be more specific than the parser's.
+			resolved.Symbol = symbolName
+			return resolved, true
+		}
+	}
+	return model.SourceRef{}, false
 }
 
 func normaliseScenarioType(rawType string) model.ScenarioType {
@@ -291,7 +335,7 @@ type ReviewTool struct {
 	Blackboard *memory.Blackboard
 }
 
-func (reviewTool *ReviewTool) Name() string { return "review.emit" }
+func (reviewTool *ReviewTool) Name() string { return "review_emit" }
 
 func (reviewTool *ReviewTool) Description() string {
 	return "Record your review of the scenario catalogue. Call this exactly once. Pass an empty " +

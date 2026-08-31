@@ -35,7 +35,7 @@ type ParseGoTool struct {
 	Source repo.Source
 }
 
-func (parseTool *ParseGoTool) Name() string { return "code.parse_go" }
+func (parseTool *ParseGoTool) Name() string { return "code_parse_go" }
 
 func (parseTool *ParseGoTool) Description() string {
 	return "Parse a Go file and return its package, imports, exported symbols with signatures, " +
@@ -46,7 +46,7 @@ func (parseTool *ParseGoTool) Description() string {
 func (parseTool *ParseGoTool) InputSchema() json.RawMessage {
 	return json.RawMessage(`{
   "type":"object",
-  "properties":{"path":{"type":"string","description":"Path to a .go file, as listed by repo.tree"}},
+  "properties":{"path":{"type":"string","description":"Path to a .go file, as listed by repo_tree"}},
   "required":["path"],
   "additionalProperties":false
 }`)
@@ -64,13 +64,14 @@ func (parseTool *ParseGoTool) Invoke(ctx context.Context, arguments json.RawMess
 	}
 	if !strings.HasSuffix(parsedArguments.Path, ".go") {
 		return tool.Result{}, tool.Correctable(parseTool.Name(), fmt.Sprintf(
-			"%q is not a Go file; use code.parse_python for .py files", parsedArguments.Path))
+			"%q is not a Go file. This tool only parses .go files; "+
+				"read other files with repo_read_file instead", parsedArguments.Path))
 	}
 
 	sourceText, err := parseTool.Source.ReadFile(ctx, parsedArguments.Path)
 	if err != nil {
 		return tool.Result{}, tool.Correctable(parseTool.Name(), fmt.Sprintf(
-			"could not read %q; call repo.tree to list valid paths", parsedArguments.Path))
+			"could not read %q; use the path exactly as it was given to you", parsedArguments.Path))
 	}
 
 	analysis, err := AnalyseGoSource(parsedArguments.Path, sourceText)

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
+	"sync/atomic"
 
 	"github.com/giri-ms19/testplan-agent/internal/guard"
 	"github.com/giri-ms19/testplan-agent/internal/llm"
@@ -20,7 +22,7 @@ import (
 // sense to someone who has already read the code has saved nobody any work.
 const AuthorSystemPrompt = `You are writing test scenarios for one specific risk in a codebase.
 
-Read the code the risk points at, then call scenario.emit once with every scenario
+Read the code the risk points at, then call scenario_emit once with every scenario
 you intend to write, and stop.
 
 Standards:
@@ -39,7 +41,7 @@ Standards:
 // findings is a cost control as much as a quality one.
 const CriticSystemPrompt = `You are reviewing a catalogue of test scenarios before a human reads it.
 
-Call review.emit exactly once and stop. Pass an empty findings array to approve.
+Call review_emit exactly once and stop. Pass an empty findings array to approve.
 
 Raise a finding only if you would defend it to the author. Look for:
 - A scenario whose expected result is not observable or not checkable.
@@ -55,8 +57,14 @@ Do not rewrite scenarios yourself. Do not praise. Report only what is wrong.`
 
 // Author writes scenarios for each prioritised risk.
 type Author struct {
-	Source        repo.Source
-	Provider      llm.Provider
+	Source   repo.Source
+	Provider llm.Provider
+	// Concurrency bounds the fan-out across risks. Zero means three.
+	//
+	// Risks are independent, so authoring them one at a time only made the
+	// phase look like a hang: nothing printed between the first line and the
+	// last, minutes later, on the slowest tier.
+	Concurrency   int
 	PerRiskBudget guard.Budget
 	Logf          func(format string, arguments ...any)
 }
@@ -85,13 +93,7 @@ func (author *Author) Write(ctx context.Context, blackboard *memory.Blackboard) 
 			"no critical or high risks were found; scenarios were written for the highest-scoring components instead")
 	}
 
-	for _, targetRisk := range targetRisks {
-		if err := ctx.Err(); err != nil {
-			blackboard.NoteGap(author.Name(), targetRisk.ID, "run cancelled before authoring")
-			break
-		}
-		author.writeForRisk(ctx, blackboard, targetRisk)
-	}
+	author.writeForRisks(ctx, blackboard, targetRisks)
 
 	if len(blackboard.Scenarios()) == 0 {
 		return fmt.Errorf("author: no scenarios were produced")
@@ -99,9 +101,124 @@ func (author *Author) Write(ctx context.Context, blackboard *memory.Blackboard) 
 	return nil
 }
 
+// writeForRisks fans out across risks, the way the Analyst fans out across
+// files.
+//
+// Authoring was sequential on the strongest tier, so a repository with twenty
+// prioritised risks spent twenty model round trips in a row with nothing on
+// screen — indistinguishable from a hang. Risks are independent: each one gets
+// a fresh context and writes its own scenarios to the blackboard.
+func (author *Author) writeForRisks(
+	ctx context.Context, blackboard *memory.Blackboard, targetRisks []model.Risk,
+) {
+	concurrency := author.Concurrency
+	if concurrency < 1 {
+		concurrency = 3
+	}
+
+	workQueue := make(chan model.Risk)
+	var waitGroup sync.WaitGroup
+	var completedCount atomic.Int64
+
+	for workerNumber := 0; workerNumber < concurrency; workerNumber++ {
+		waitGroup.Add(1)
+		go func() {
+			defer waitGroup.Done()
+			for targetRisk := range workQueue {
+				author.writeForRisk(ctx, blackboard, targetRisk)
+				// Count this risk's own scenarios, not the change in the total.
+				// A before/after delta on a shared blackboard measures whatever
+				// the other workers did in the meantime, which is how a risk
+				// that failed outright came to report "24 scenarios".
+				author.logf("author: %s (%d/%d) — %d scenarios",
+					targetRisk.ID, completedCount.Add(1), len(targetRisks),
+					scenarioCountForRisk(blackboard, targetRisk.ID))
+			}
+		}()
+	}
+
+	for _, targetRisk := range targetRisks {
+		select {
+		case <-ctx.Done():
+			blackboard.NoteGap(author.Name(), targetRisk.ID, "run cancelled before authoring")
+		case workQueue <- targetRisk:
+			continue
+		}
+		break
+	}
+	close(workQueue)
+	waitGroup.Wait()
+}
+
+// scenarioCountForRisk counts what one risk actually produced. It is safe to
+// call while other workers are writing, because it attributes by risk rather
+// than by arithmetic on a shared total.
+func scenarioCountForRisk(blackboard *memory.Blackboard, riskID string) int {
+	count := 0
+	for _, scenario := range blackboard.Scenarios() {
+		if scenario.RiskRef == riskID {
+			count++
+		}
+	}
+	return count
+}
+
+// Revise re-authors only the risks a reviewer actually flagged.
+//
+// The revision round used to re-run every risk from scratch, so one blocking
+// finding on one scenario cost a second full pass over the whole register on
+// the strongest tier. Nothing about the unflagged risks had changed.
+func (author *Author) Revise(
+	ctx context.Context, blackboard *memory.Blackboard, findings []model.RevisionRequest,
+) error {
+	riskRegister := blackboard.RiskRegister()
+	if riskRegister == nil {
+		return fmt.Errorf("author: no risk register")
+	}
+
+	flaggedRiskIDs := map[string]bool{}
+	for _, finding := range findings {
+		if !finding.Blocking() {
+			continue
+		}
+		if finding.RiskRef != "" {
+			flaggedRiskIDs[finding.RiskRef] = true
+			continue
+		}
+		// A finding naming only a scenario still identifies its risk.
+		for _, scenario := range blackboard.Scenarios() {
+			if scenario.ID == finding.ScenarioID && scenario.RiskRef != "" {
+				flaggedRiskIDs[scenario.RiskRef] = true
+			}
+		}
+	}
+
+	risksToRevise := make([]model.Risk, 0, len(flaggedRiskIDs))
+	for _, candidateRisk := range riskRegister.Risks {
+		if flaggedRiskIDs[candidateRisk.ID] {
+			risksToRevise = append(risksToRevise, candidateRisk)
+		}
+	}
+	if len(risksToRevise) == 0 {
+		// The findings could not be attributed to a risk, so there is nothing
+		// targeted to redo. Saying so beats silently re-running everything.
+		blackboard.NoteGap(author.Name(), "revision",
+			"blocking findings could not be traced to a specific risk; no targeted revision was possible")
+		return nil
+	}
+
+	author.logf("author: revising %d of %d risks that have blocking findings",
+		len(risksToRevise), len(riskRegister.Risks))
+	author.writeForRisks(ctx, blackboard, risksToRevise)
+	return nil
+}
+
 func (author *Author) writeForRisk(ctx context.Context, blackboard *memory.Blackboard, targetRisk model.Risk) {
 	riskRegistry := tool.NewRegistry()
-	riskRegistry.Register(&repo.ReadFileTool{Source: author.Source, MaxLines: 400}, tool.NetworkPolicy())
+	riskRegistry.Register(&repo.ReadFileTool{
+		Source: author.Source, MaxLines: 2000, MaxBytes: AnalystReadMaxBytes,
+		PathGuidance: "Use the paths given in the risk you are writing scenarios for.",
+	}, tool.NetworkPolicy())
 	riskRegistry.Register(&code.ParseGoTool{Source: author.Source}, tool.LocalPolicy())
 	riskRegistry.Register(&emit.ScenarioTool{
 		Blackboard: blackboard,
@@ -131,9 +248,24 @@ func (author *Author) writeForRisk(ctx context.Context, blackboard *memory.Black
 		author.logf("author: %s failed: %v", targetRisk.ID, err)
 		return
 	}
+	// A risk that produced nothing has to say why on screen, not only in the
+	// report's gaps section. "0 scenarios" with no reason is the same dead end
+	// the analyst used to have: you can see that it failed and not what to
+	// change.
 	if outcome.StoppedBy != nil {
 		blackboard.NoteGap(author.Name(), targetRisk.ID,
 			"authoring stopped early ("+string(outcome.StoppedBy.Reason)+"): "+outcome.StoppedBy.Detail)
+		author.logf("author: %s stopped: %s [called: %s]",
+			targetRisk.ID, outcome.StoppedBy.Detail, outcome.CallSummary())
+		return
+	}
+	if scenarioCountForRisk(blackboard, targetRisk.ID) == 0 {
+		// The loop ended on its own terms and still emitted nothing, which is
+		// the quietest failure of all: no error, no guard, no output.
+		blackboard.NoteGap(author.Name(), targetRisk.ID,
+			"the author finished without emitting any scenario")
+		author.logf("author: %s produced nothing (loop ended after %d iterations) [called: %s]",
+			targetRisk.ID, outcome.IterationCount, outcome.CallSummary())
 	}
 }
 
@@ -187,7 +319,7 @@ func buildAuthorInstruction(targetRisk model.Risk, blackboard *memory.Blackboard
 		}
 	}
 
-	instructionBuilder.WriteString("\nRead the anchor, then call scenario.emit.")
+	instructionBuilder.WriteString("\nRead the anchor, then call scenario_emit.")
 	return instructionBuilder.String()
 }
 
@@ -282,7 +414,7 @@ func buildCriticInstruction(blackboard *memory.Blackboard) string {
 		}
 		fmt.Fprintf(&instructionBuilder, "  expected: %s\n", scenario.ExpectedResult)
 	}
-	instructionBuilder.WriteString("\nCall review.emit with your findings.")
+	instructionBuilder.WriteString("\nCall review_emit with your findings.")
 	return instructionBuilder.String()
 }
 
@@ -343,7 +475,7 @@ func (revisionCycle *RevisionCycle) Run(ctx context.Context, blackboard *memory.
 					blockingCount, maxRounds))
 			return nil
 		}
-		if err := revisionCycle.Author.Write(ctx, blackboard); err != nil {
+		if err := revisionCycle.Author.Revise(ctx, blackboard, findings); err != nil {
 			return err
 		}
 	}

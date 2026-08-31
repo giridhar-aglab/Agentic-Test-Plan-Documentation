@@ -23,15 +23,28 @@ import (
 // small is what keeps their contexts small.
 const AnalystSystemPrompt = `You are analysing a single source file to prepare a test plan.
 
-Read the file with code.parse_go (or repo.read_file for a language it cannot parse).
-Then call analysis.emit_component exactly once and stop.
+Read the file with code_parse_go (or repo_read_file for a language it cannot parse).
+Then call analysis_emit_component exactly once and stop.
 
 Ground every claim in code you have actually read. If the file does not show you
 something, leave that field empty rather than guessing. Pay particular attention
 to error paths: every distinct way the component can fail is a scenario someone
 will need to write.
 
-Do not analyse other files. Do not suggest tests. Do not explain yourself in prose.`
+Do not analyse other files. Do not suggest tests. Do not explain yourself in prose.
+
+You have exactly three tools: code_parse_go, repo_read_file and
+analysis_emit_component. There is no tool for listing the repository, and you do
+not need one — your task names the only file you should open.
+
+One read is enough. If a file comes back truncated, analyse what you were shown
+and emit; a partial reading recorded is worth far more than a complete one you
+never got to. Emit before you run out of turns.`
+
+// AnalystReadMaxBytes bounds one analyst file read. It must stay below the
+// loop's spill threshold; TestTheAnalystsOwnFileReadCanNeverBeSpilled enforces
+// that, and enforces it exactly rather than by estimating bytes per line.
+const AnalystReadMaxBytes = 40000
 
 // Analyst produces one ComponentModel per selected file.
 //
@@ -152,9 +165,6 @@ func summariseReason(reason string) string {
 
 // analyseOne returns a failure reason, or "" when the component was recorded.
 func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Blackboard, sourceFile model.SourceFile) string {
-	componentRegistry := tool.NewRegistry()
-	componentRegistry.Register(&repo.ReadFileTool{Source: analyst.Source, MaxLines: 400}, tool.NetworkPolicy())
-	componentRegistry.Register(&code.ParseGoTool{Source: analyst.Source}, tool.LocalPolicy())
 	// The deterministic pass runs first and becomes the base the model enriches.
 	// Symbols, complexity and third-party imports are facts, not judgements.
 	baseModel := model.ComponentModel{
@@ -172,7 +182,7 @@ func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Black
 			}
 		}
 	}
-	componentRegistry.Register(&emit.ComponentTool{Blackboard: blackboard, Base: baseModel}, tool.LocalPolicy())
+	componentRegistry := analyst.registryFor(blackboard, baseModel)
 
 	repeatGuard := guard.DefaultRepeatCallGuard()
 	componentGuards := guard.Chain{
@@ -190,7 +200,7 @@ func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Black
 		Tier:         llm.TierBalanced,
 		SystemPrompt: AnalystSystemPrompt,
 		Instruction: fmt.Sprintf(
-			"Analyse %s (%s, %d bytes). Read it, then call analysis.emit_component.",
+			"Analyse %s (%s, %d bytes). Read it once, then call analysis_emit_component.",
 			sourceFile.Path, sourceFile.Language, sourceFile.SizeBytes),
 	})
 
@@ -202,19 +212,58 @@ func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Black
 	if outcome.StoppedBy != nil {
 		blackboard.NoteGap(analyst.Name(), sourceFile.Path,
 			"analysis stopped early ("+string(outcome.StoppedBy.Reason)+"): "+outcome.StoppedBy.Detail)
-		analyst.logf("analyst: %s stopped: %s", sourceFile.Path, outcome.StoppedBy.Detail)
+		analyst.logf("analyst: %s stopped: %s [called: %s]",
+			sourceFile.Path, outcome.StoppedBy.Detail, outcome.CallSummary())
 	}
 
 	// A loop that ended without emitting is a silent failure unless it is
 	// recorded. Checking the blackboard rather than trusting the outcome is the
 	// same principle as a phase postcondition, one level down.
 	if !analyst.componentWasRecorded(blackboard, sourceFile.Path) {
+		// The model never emitted — but the deterministic pass already ran, and
+		// its symbols, complexity and error paths are facts regardless of what
+		// the model did with its turns. Throwing them away would drop the
+		// component out of the risk register entirely, which is a worse answer
+		// than an honestly shallow one.
+		if baseModel.Depth == model.DepthTypeResolved {
+			salvaged := baseModel
+			salvaged.Responsibility = ""
+			salvaged.Confidence = 0.3
+			salvaged.AnalysedAt = time.Now().UTC()
+			blackboard.AddComponentModel(salvaged)
+			blackboard.NoteGap(analyst.Name(), sourceFile.Path,
+				"the model did not record an analysis; structure was taken from the parser alone")
+			analyst.logf("analyst: %s fell back to structural analysis only", sourceFile.Path)
+			return ""
+		}
 		const reason = "the analyst finished without recording an analysis " +
 			"(the model may not support tool calling)"
 		blackboard.NoteGap(analyst.Name(), sourceFile.Path, reason)
 		return reason
 	}
 	return ""
+}
+
+// registryFor builds the analyst's tool set. It is deliberately tiny: three
+// tools, none of which can reach outside the one file under analysis.
+func (analyst *Analyst) registryFor(
+	blackboard *memory.Blackboard, baseModel model.ComponentModel,
+) *tool.Registry {
+	componentRegistry := tool.NewRegistry()
+	// 1500 lines covers all but a handful of source files whole. The previous
+	// 400 turned every large file into a paging session that ate the iteration
+	// budget before the model ever reached the emit call.
+	// MaxBytes sits below the loop's spill threshold on purpose: an analyst
+	// read that spilled would be digested and then fetched back in pieces,
+	// costing several times what sending it once costs. AnalystReadMaxBytes is
+	// asserted against that threshold in the tests.
+	componentRegistry.Register(&repo.ReadFileTool{
+		Source: analyst.Source, MaxLines: 2000, MaxBytes: AnalystReadMaxBytes,
+		PathGuidance: "Read only the file named in your task, using exactly that path.",
+	}, tool.NetworkPolicy())
+	componentRegistry.Register(&code.ParseGoTool{Source: analyst.Source}, tool.LocalPolicy())
+	componentRegistry.Register(&emit.ComponentTool{Blackboard: blackboard, Base: baseModel}, tool.LocalPolicy())
+	return componentRegistry
 }
 
 func (analyst *Analyst) componentWasRecorded(blackboard *memory.Blackboard, filePath string) bool {

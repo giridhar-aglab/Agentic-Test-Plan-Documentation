@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/giri-ms19/testplan-agent/internal/memory"
@@ -170,4 +171,113 @@ func TestScoringNoteExplainsItself(t *testing.T) {
 	if riskRegister.ScoringNote == "" {
 		t.Fatal("the register must explain how it was scored")
 	}
+}
+
+func TestPrioritisationSelectsAMinorityOfARealRepository(t *testing.T) {
+	// Absolute thresholds tuned on a three-file fixture called 42 of 58 real
+	// components critical or high. A register that prioritises 72% of a
+	// codebase tells a reviewer nothing about where to start, and it made the
+	// author phase forty-two strong-tier agents instead of a handful.
+	componentModels := make([]model.ComponentModel, 0, 58)
+	for index := range 58 {
+		componentModels = append(componentModels, model.ComponentModel{
+			ComponentName: fmt.Sprintf("pkg/component%02d", index),
+			Path:          fmt.Sprintf("pkg/component%02d.go", index),
+			Language:      model.LanguageGo,
+			Depth:         model.DepthTypeResolved,
+			// A spread of complexity, the way a real repository has.
+			PublicSymbols: makeSymbols(index%9 + 1),
+			ErrorPaths:    makeStrings("fails", index%5),
+		})
+	}
+
+	blackboard := memory.NewBlackboard("run")
+	blackboard.SetRepoMap(model.RepoMap{})
+	for _, componentModel := range componentModels {
+		blackboard.AddComponentModel(componentModel)
+	}
+	if err := NewRiskScorer().Score(blackboard); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	register := blackboard.RiskRegister()
+	prioritised := register.Prioritised()
+	fraction := float64(len(prioritised)) / float64(len(register.Risks))
+	if fraction > 0.40 {
+		t.Errorf("prioritisation selected %d of %d components (%.0f%%); that is a list, not a ranking",
+			len(prioritised), len(register.Risks), fraction*100)
+	}
+	if len(prioritised) == 0 {
+		t.Error("something must always be prioritised, or there is nothing to author")
+	}
+}
+
+func TestEqualScoresNeverStraddleABandBoundary(t *testing.T) {
+	// A boundary that splits identical scores would make the level arbitrary,
+	// and two identical components getting different priorities is the kind of
+	// thing that destroys trust in a generated plan.
+	blackboard := memory.NewBlackboard("run")
+	blackboard.SetRepoMap(model.RepoMap{})
+	for index := range 20 {
+		blackboard.AddComponentModel(model.ComponentModel{
+			ComponentName: fmt.Sprintf("pkg/same%02d", index),
+			Path:          fmt.Sprintf("pkg/same%02d.go", index),
+			Language:      model.LanguageGo, Depth: model.DepthTypeResolved,
+			PublicSymbols: makeSymbols(3), ErrorPaths: makeStrings("fails", 2),
+		})
+	}
+	if err := NewRiskScorer().Score(blackboard); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	risks := blackboard.RiskRegister().Risks
+	for index := 1; index < len(risks); index++ {
+		if risks[index].Score == risks[index-1].Score && risks[index].Level != risks[index-1].Level {
+			t.Fatalf("identical scores %.1f got different levels: %s vs %s",
+				risks[index].Score, risks[index-1].Level, risks[index].Level)
+		}
+	}
+}
+
+func TestASmallRepositoryDoesNotGetAnInventedCriticalRisk(t *testing.T) {
+	// Percentiles are meaningless on four files: the top one would be
+	// "critical" purely because something has to be. Below the minimum, the
+	// absolute thresholds decide.
+	blackboard := memory.NewBlackboard("run")
+	blackboard.SetRepoMap(model.RepoMap{})
+	for index := range 4 {
+		blackboard.AddComponentModel(model.ComponentModel{
+			ComponentName: fmt.Sprintf("pkg/tiny%d", index),
+			Path:          fmt.Sprintf("pkg/tiny%d.go", index),
+			Language:      model.LanguageGo, Depth: model.DepthTypeResolved,
+			PublicSymbols: makeSymbols(1),
+		})
+	}
+	if err := NewRiskScorer().Score(blackboard); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	for _, risk := range blackboard.RiskRegister().Risks {
+		if risk.Level == model.RiskCritical && risk.Score < DefaultRiskThresholds().Critical {
+			t.Errorf("%s scored %.1f but was called critical on a four-file repository",
+				risk.ID, risk.Score)
+		}
+	}
+}
+
+func makeSymbols(count int) []model.Symbol {
+	symbols := make([]model.Symbol, 0, count)
+	for index := range count {
+		symbols = append(symbols, model.Symbol{
+			Name: fmt.Sprintf("Exported%d", index), Exported: true, BranchCount: index + 1,
+		})
+	}
+	return symbols
+}
+
+func makeStrings(prefix string, count int) []string {
+	values := make([]string, 0, count)
+	for index := range count {
+		values = append(values, fmt.Sprintf("%s %d", prefix, index))
+	}
+	return values
 }

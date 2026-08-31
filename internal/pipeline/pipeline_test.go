@@ -132,8 +132,8 @@ func (provider *routingProvider) Complete(ctx context.Context, request llm.Reque
 	}
 
 	switch {
-	case availableTools["analysis.emit_component"]:
-		return toolCallResponse("analysis.emit_component", map[string]any{
+	case availableTools["analysis_emit_component"]:
+		return toolCallResponse("analysis_emit_component", map[string]any{
 			"responsibility": "Applies entries to accounts and enforces balance and currency rules.",
 			"errorPaths": []string{
 				"entry does not belong to account", "account is frozen",
@@ -143,12 +143,12 @@ func (provider *routingProvider) Complete(ctx context.Context, request llm.Reque
 			"confidence":  0.9,
 		}), nil
 
-	case availableTools["scenario.emit"]:
+	case availableTools["scenario_emit"]:
 		// Use the anchor symbol the instruction actually names. A real model
-		// that ignored it would be caught by report.validate, which is exactly
+		// that ignored it would be caught by report_validate, which is exactly
 		// what TestValidationCatchesAHallucinatedSymbol demonstrates.
 		anchorSymbol := anchorSymbolFrom(request)
-		return toolCallResponse("scenario.emit", map[string]any{
+		return toolCallResponse("scenario_emit", map[string]any{
 			"scenarios": []map[string]any{
 				{
 					"title": "Reject an operation that violates the component's precondition",
@@ -171,8 +171,8 @@ func (provider *routingProvider) Complete(ctx context.Context, request llm.Reque
 			},
 		}), nil
 
-	case availableTools["review.emit"]:
-		return toolCallResponse("review.emit", map[string]any{
+	case availableTools["review_emit"]:
+		return toolCallResponse("review_emit", map[string]any{
 			"findings": []map[string]any{},
 		}), nil
 	}
@@ -391,8 +391,8 @@ func (provider *hallucinatingProvider) Complete(ctx context.Context, request llm
 	for _, toolSchema := range request.Tools {
 		availableTools[toolSchema.Name] = true
 	}
-	if availableTools["scenario.emit"] && !alreadyEmitted(request) {
-		return toolCallResponse("scenario.emit", map[string]any{
+	if availableTools["scenario_emit"] && !alreadyEmitted(request) {
+		return toolCallResponse("scenario_emit", map[string]any{
 			"scenarios": []map[string]any{{
 				"title": "Validate the transaction reconciliation ledger",
 				"type":  "unit", "symbol": "ReconcileTransactions",
@@ -407,7 +407,7 @@ func (provider *hallucinatingProvider) Complete(ctx context.Context, request llm
 func TestValidationCatchesAHallucinatedSymbol(t *testing.T) {
 	// A scenario anchored to a symbol that does not exist is worse than no
 	// scenario: it looks authoritative and wastes a reviewer's trust. Catching
-	// it by machine is the whole reason report.validate exists.
+	// it by machine is the whole reason report_validate exists.
 	configuration := baseConfig()
 	configuration.Provider = &hallucinatingProvider{routingProvider{t: t}}
 

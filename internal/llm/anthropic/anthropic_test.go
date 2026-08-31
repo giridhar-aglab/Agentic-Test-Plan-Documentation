@@ -40,7 +40,7 @@ func TestCompleteTranslatesToolUseInBothDirections(t *testing.T) {
 			"stop_reason":"tool_use",
 			"content":[
 				{"type":"text","text":"Reading the file."},
-				{"type":"tool_use","id":"tu_1","name":"repo.read_file","input":{"path":"a.go"}}
+				{"type":"tool_use","id":"tu_1","name":"repo_read_file","input":{"path":"a.go"}}
 			],
 			"usage":{"input_tokens":120,"output_tokens":45}
 		}`))
@@ -52,14 +52,14 @@ func TestCompleteTranslatesToolUseInBothDirections(t *testing.T) {
 		Messages: []llm.Message{
 			{Role: llm.RoleUser, Text: "Analyse a.go"},
 			{Role: llm.RoleAssistant, ToolCalls: []llm.ToolCall{
-				{ID: "tu_0", ToolName: "repo.tree", Arguments: json.RawMessage(`{}`)},
+				{ID: "tu_0", ToolName: "repo_tree", Arguments: json.RawMessage(`{}`)},
 			}},
 			{Role: llm.RoleTool, ToolResults: []llm.ToolResult{
-				{CallID: "tu_0", ToolName: "repo.tree", Content: "a.go"},
+				{CallID: "tu_0", ToolName: "repo_tree", Content: "a.go"},
 			}},
 		},
 		Tools: []llm.ToolSchema{{
-			Name: "repo.read_file", Description: "read a file",
+			Name: "repo_read_file", Description: "read a file",
 			InputSchema: json.RawMessage(`{"type":"object"}`),
 		}},
 		MaxTokens: 1024,
@@ -86,7 +86,7 @@ func TestCompleteTranslatesToolUseInBothDirections(t *testing.T) {
 	if response.Text != "Reading the file." {
 		t.Errorf("unexpected text %q", response.Text)
 	}
-	if len(response.ToolCalls) != 1 || response.ToolCalls[0].ToolName != "repo.read_file" {
+	if len(response.ToolCalls) != 1 || response.ToolCalls[0].ToolName != "repo_read_file" {
 		t.Fatalf("tool call did not survive translation: %+v", response.ToolCalls)
 	}
 	if response.StopReason != llm.StopToolUse {

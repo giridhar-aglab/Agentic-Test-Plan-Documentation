@@ -62,11 +62,11 @@ func TestRetryRecoversFromTransientFailure(t *testing.T) {
 
 func TestNonIdempotentToolIsNeverRetried(t *testing.T) {
 	// The rule that stops a re-run flooding Jira with duplicate tickets.
-	writeTool := &flakyTool{toolName: "jira.push", failuresRemaining: 1, failureClass: FailureRetryable, idempotent: false}
+	writeTool := &flakyTool{toolName: "jira_push", failuresRemaining: 1, failureClass: FailureRetryable, idempotent: false}
 	registry := NewRegistry()
 	registry.Register(writeTool, testPolicy())
 
-	if _, err := registry.Invoke(context.Background(), "jira.push", json.RawMessage(`{}`)); err == nil {
+	if _, err := registry.Invoke(context.Background(), "jira_push", json.RawMessage(`{}`)); err == nil {
 		t.Fatal("expected the failure to surface rather than be retried away")
 	}
 	if writeTool.invokeCount != 1 {
@@ -160,21 +160,21 @@ func TestFallbackNotUsedForCorrectableFailure(t *testing.T) {
 
 func TestUnknownToolIsCorrectableAndNamesAlternatives(t *testing.T) {
 	registry := NewRegistry()
-	registry.Register(&flakyTool{toolName: "repo.tree", idempotent: true}, testPolicy())
+	registry.Register(&flakyTool{toolName: "repo_tree", idempotent: true}, testPolicy())
 
-	_, err := registry.Invoke(context.Background(), "repo.walk", json.RawMessage(`{}`))
+	_, err := registry.Invoke(context.Background(), "repo_walk", json.RawMessage(`{}`))
 	if ClassOf(err) != FailureCorrectable {
 		t.Fatalf("calling an unknown tool is the model's mistake to fix, got %v", ClassOf(err))
 	}
-	if advice := AdviceOf(err); !strings.Contains(advice, "repo.tree") {
+	if advice := AdviceOf(err); !strings.Contains(advice, "repo_tree") {
 		t.Fatalf("advice must name what the model may actually call, got %q", advice)
 	}
 }
 
 func TestScopedRegistryRefusesUnknownTool(t *testing.T) {
 	registry := NewRegistry()
-	registry.Register(&flakyTool{toolName: "repo.tree", idempotent: true}, testPolicy())
-	if _, err := registry.Scoped("jira.push"); err == nil {
+	registry.Register(&flakyTool{toolName: "repo_tree", idempotent: true}, testPolicy())
+	if _, err := registry.Scoped("jira_push"); err == nil {
 		t.Fatal("scoping to a tool that was never registered must fail loudly at wiring time")
 	}
 }

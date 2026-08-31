@@ -44,7 +44,9 @@ func run() error {
 	mcpCommand := flag.String("mcp-command", defaultMCPCommand(),
 		"command that starts the GitHub MCP server (or set GITHUB_MCP_COMMAND)")
 	repositoryName := flag.String("name", "", "repository name for the report")
-	outputPath := flag.String("out", "", "write the report here instead of stdout")
+	outputPath := flag.String("out", "", "write the report here (default: a name derived from the repository)")
+	outputFormat := flag.String("format", "", "md, html, or both (default: inferred from -out, else both)")
+	outputDirectory := flag.String("out-dir", "reports", "directory for reports when -out is not given")
 	checkpointDirectory := flag.String("checkpoints", "", "directory for per-phase blackboard checkpoints")
 	maxFiles := flag.Int("max-files", 400, "refuse repositories larger than this")
 	concurrency := flag.Int("concurrency", 4, "analyst fan-out width")
@@ -54,14 +56,19 @@ func run() error {
 		"connect to the GitHub MCP server, report what it offers, and exit without running the pipeline")
 	mcpToolTree := flag.String("mcp-tool-tree", "", "override the remote tool used to list the repository tree")
 	mcpToolFile := flag.String("mcp-tool-file", "", "override the remote tool used to read a file")
-	verbose := flag.Bool("v", false, "log phase progress")
+	verbose := flag.Bool("v", true, "log phase progress (on by default; use -quiet to silence)")
+	quiet := flag.Bool("quiet", false, "suppress progress output; only errors and the final path are printed")
 	flag.Parse()
 
 	ctx, stopSignals := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stopSignals()
 
+	// Progress goes to stderr, so it never mixes with a report on stdout.
+	// It is on by default because this tool runs for minutes: a silent
+	// process is one a person kills, and every "it is stuck" report so far
+	// has been a run that was working.
 	logf := func(format string, arguments ...any) {}
-	if *verbose {
+	if *verbose && !*quiet {
 		logf = func(format string, arguments ...any) {
 			fmt.Fprintf(os.Stderr, "[%s] %s\n", time.Now().Format("15:04:05"), fmt.Sprintf(format, arguments...))
 		}
@@ -123,18 +130,27 @@ func run() error {
 	}
 
 	validationReport := approval.Validate(blackboard)
-	reportMarkdown := render.PlanMarkdown(blackboard, render.Options{
+	renderOptions := render.Options{
 		SourceLinkBase: resolvedLinkBase,
 		Validation:     &validationReport,
-	})
+	}
+	reportMarkdown := render.PlanMarkdown(blackboard, renderOptions)
 
-	if *outputPath != "" {
-		if err := os.WriteFile(*outputPath, []byte(reportMarkdown), 0o644); err != nil {
-			return fmt.Errorf("write report: %w", err)
-		}
-		fmt.Fprintf(os.Stderr, "report written to %s\n", *outputPath)
-	} else {
+	writtenPaths, err := writeReports(reportMarkdown, reportDestination{
+		ExplicitPath:   *outputPath,
+		Format:         *outputFormat,
+		Directory:      *outputDirectory,
+		RepositoryName: displayName,
+		CommitSHA:      commitSHA,
+	})
+	if err != nil {
+		return err
+	}
+	if len(writtenPaths) == 0 {
 		fmt.Print(reportMarkdown)
+	}
+	for _, writtenPath := range writtenPaths {
+		fmt.Fprintf(os.Stderr, "report written to %s\n", writtenPath)
 	}
 
 	for _, phaseResult := range runReport.PhaseResults {
@@ -199,7 +215,9 @@ func buildSource(ctx context.Context, options sourceOptions) (repo.Source, strin
 	if options.ToolOverrides.GetFile != "" {
 		resolvedToolNames.GetFile = options.ToolOverrides.GetFile
 	}
-	if resolvedToolNames.Tree == "" || resolvedToolNames.GetFile == "" {
+	// Only the file tool is indispensable. Without a tree tool the listing is
+	// built by walking directories, which is slower but not worse.
+	if resolvedToolNames.GetFile == "" {
 		closeClient()
 		return nil, "", "", noop, resolveErr
 	}
@@ -212,6 +230,7 @@ func buildSource(ctx context.Context, options sourceOptions) (repo.Source, strin
 	githubSource := mcpx.NewGitHubSource(client, reference.Owner, reference.Repository,
 		reference.Ref, options.MaxFiles)
 	githubSource.ToolNames = resolvedToolNames
+	githubSource.Logf = options.Logf
 
 	return githubSource, displayName, reference.Ref, closeClient, nil
 }
@@ -296,7 +315,7 @@ func checkMCPServer(ctx context.Context, options sourceOptions) error {
 	if options.ToolOverrides.GetFile != "" {
 		resolvedToolNames.GetFile = options.ToolOverrides.GetFile
 	}
-	if resolvedToolNames.Tree == "" || resolvedToolNames.GetFile == "" {
+	if resolvedToolNames.GetFile == "" {
 		return resolveErr
 	}
 	fmt.Printf("resolved      %s\n", resolvedToolNames.Describe())
@@ -306,6 +325,9 @@ func checkMCPServer(ctx context.Context, options sourceOptions) error {
 	githubSource := mcpx.NewGitHubSource(client, reference.Owner, reference.Repository,
 		reference.Ref, options.MaxFiles)
 	githubSource.ToolNames = resolvedToolNames
+	githubSource.Logf = func(format string, arguments ...any) {
+		fmt.Printf("note          "+format+"\n", arguments...)
+	}
 
 	entries, err := githubSource.Tree(ctx)
 	if err != nil {
@@ -345,27 +367,55 @@ func buildProvider(logf func(format string, arguments ...any)) llm.Provider {
 	// placeholder scenarios is the kind of downgrade someone discovers only
 	// after showing the result to somebody else.
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
+		warnOnMismatchedKey("ANTHROPIC_API_KEY", apiKey, "sk-ant-", "OPENAI_API_KEY")
 		provider := anthropic.New(apiKey)
 		if endpointOverride := os.Getenv("ANTHROPIC_BASE_URL"); endpointOverride != "" {
 			provider.Endpoint = strings.TrimSuffix(endpointOverride, "/") + "/v1/messages"
 		}
 		provider.Models = anthropicModelsFromEnvironment()
-		fmt.Fprintf(os.Stderr, "model backend: anthropic (model %s)\n",
-			provider.Models[llm.TierBalanced])
+		describeBackend("anthropic", "", map[llm.Tier]string(provider.Models))
 		return provider
 	}
 
 	openAIKey := os.Getenv("OPENAI_API_KEY")
 	openAIBaseURL := os.Getenv("OPENAI_BASE_URL")
 	if openAIKey != "" || openAIBaseURL != "" {
+		if strings.HasPrefix(openAIKey, "sk-ant-") {
+			fmt.Fprint(os.Stderr, `
+!! OPENAI_API_KEY holds a key beginning "sk-ant-", which is an Anthropic key.
+!! It will be rejected by an OpenAI-compatible endpoint. Set ANTHROPIC_API_KEY
+!! instead, and clear this one:  $env:OPENAI_API_KEY=""
+
+`)
+		}
 		provider := openaicompat.New(openAIKey, openAIBaseURL, modelsFromEnvironment())
-		fmt.Fprintf(os.Stderr, "model backend: openai-compatible at %s (model %s)\n",
-			provider.BaseURL, provider.Models[llm.TierBalanced])
+		describeBackend("openai-compatible", provider.BaseURL, map[llm.Tier]string(provider.Models))
 		return provider
 	}
 
 	fmt.Fprint(os.Stderr, noModelBackendWarning)
 	return nil
+}
+
+// warnOnMismatchedKey catches a credential put in the wrong variable. The
+// symptom otherwise is a 401 partway into a run, after the survey has already
+// succeeded, which reads like a broken program rather than a typo.
+//
+// This warns rather than refuses: key formats are the vendor's to change, and
+// being wrong about one should not block a run that would otherwise work.
+func warnOnMismatchedKey(variableName, apiKey, expectedPrefix, otherVariableName string) {
+	if strings.HasPrefix(apiKey, expectedPrefix) {
+		return
+	}
+	fmt.Fprintf(os.Stderr, `
+!! %s does not begin %q, so it may not be an Anthropic key.
+!! An OpenAI key here produces "401 authentication_error" partway into the run.
+!! If this is an OpenAI key, clear it and use the other variable:
+!!
+!!   $env:%s=""          # PowerShell
+!!   $env:%s="sk-..."
+!!
+`, variableName, expectedPrefix, variableName, otherVariableName)
 }
 
 // noModelBackendWarning names every variable that would fix the situation,
@@ -454,4 +504,44 @@ func currentCommitSHA(repositoryDirectory string) string {
 		return strings.TrimSpace(string(referenceContent))
 	}
 	return headText
+}
+
+// describeBackend prints the whole model configuration, not one tier of three.
+//
+// The banner used to report only the balanced tier, so setting
+// OPENAI_MODEL_STRONG to a better model for the Author and Critic changed the
+// run but not the line describing it — the tool said "gpt-4o-mini" while
+// running gpt-4o, which is worse than saying nothing.
+func describeBackend(backendName, baseURL string, modelsByTier map[llm.Tier]string) {
+	location := ""
+	if baseURL != "" {
+		location = " at " + baseURL
+	}
+
+	// The common case is one model everywhere; say that in one line.
+	distinct := map[string]bool{}
+	for _, modelName := range modelsByTier {
+		distinct[modelName] = true
+	}
+	if len(distinct) == 1 {
+		for modelName := range distinct {
+			fmt.Fprintf(os.Stderr, "model backend: %s%s (model %s for every role)\n",
+				backendName, location, modelName)
+		}
+		return
+	}
+
+	// Tiers are named for what they cost; a reader wants to know which agent
+	// each one drives.
+	fmt.Fprintf(os.Stderr, "model backend: %s%s\n", backendName, location)
+	for _, row := range []struct {
+		tier  llm.Tier
+		roles string
+	}{
+		{llm.TierFast, "survey"},
+		{llm.TierBalanced, "analysis"},
+		{llm.TierStrong, "author + critic"},
+	} {
+		fmt.Fprintf(os.Stderr, "  %-16s %s\n", row.roles, modelsByTier[row.tier])
+	}
 }

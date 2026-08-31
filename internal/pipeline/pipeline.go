@@ -157,6 +157,7 @@ func addAuthorPhase(pipeline *orchestrator.Orchestrator, config Config) {
 			revisionCycle := &agent.RevisionCycle{
 				Author: &agent.Author{
 					Source: config.Source, Provider: config.Provider,
+					Concurrency: config.AnalystConcurrency,
 					PerRiskBudget: guard.Budget{
 						MaxIterations: 8, MaxToolCalls: 20, MaxTokens: 80000, MaxWallClock: 4 * time.Minute,
 					},

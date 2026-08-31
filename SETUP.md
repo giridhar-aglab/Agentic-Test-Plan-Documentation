@@ -20,9 +20,35 @@ so if level 2 fails you already know levels 0 and 1 were sound.
 No other dependencies. The project has **zero third-party Go modules**, so
 `go build` never contacts a module proxy.
 
+### Which shell am I in?
+
+Get this wrong and nothing else works. **Visual Studio's default terminal is
+PowerShell, not cmd.** The tell is in the error text:
+
+| Error wording | Shell |
+|---|---|
+| `... is not recognized as the name of a **cmdlet**` | PowerShell |
+| `... is not recognized as an internal or external command` | cmd.exe |
+| A `>>` continuation prompt after a line ending in `^` | PowerShell (it does not understand `^`) |
+
+Two things differ and both bite:
+
+| | PowerShell | cmd.exe |
+|---|---|---|
+| Set a variable | ``$env:NAME="value"`` | `set NAME=value` (no quotes) |
+| Continue a line | `` ` `` (backtick) | `^` (caret) |
+
+**In PowerShell, `set NAME=value` does not set an environment variable.** `set`
+is an alias for `Set-Variable`, so the value never reaches the program. If you
+have been using `set` in PowerShell, nothing you set has taken effect — which
+shows up as the `!! NO MODEL BACKEND CONFIGURED` banner.
+
+Simplest way to avoid line-continuation problems entirely: **put the whole
+command on one line.** It is long, but it always works.
+
 ### Environment variable syntax
 
-This trips people up constantly. Pick the one matching your shell:
+Pick the one matching your shell:
 
 ```cmd
 :: Windows cmd.exe  — no quotes; cmd would include them in the value
@@ -56,7 +82,7 @@ go build ./...
 go test ./...
 ```
 
-Expect every package `ok`, 137 tests. This exercises the whole control layer —
+Expect every package `ok`, 198 tests. This exercises the whole control layer —
 guards, retry, circuit breaker, MCP client and server against each other,
 the Anthropic wire format against a local HTTP stub — with no network and no
 credentials.
@@ -81,12 +107,17 @@ format — which includes a model running on your own machine.
 
 Selection is by environment, first match wins:
 
-| Variables | Backend |
-|---|---|
-| `ANTHROPIC_API_KEY` | Anthropic |
-| `OPENAI_API_KEY` (+ optional `OPENAI_BASE_URL`) | OpenAI, or any compatible host |
-| `OPENAI_BASE_URL` alone | A local runtime that needs no key |
-| none | Deterministic fallbacks; placeholders, no cost |
+| Variables | Backend | Key prefix |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | Anthropic | `sk-ant-…` |
+| `OPENAI_API_KEY` (+ optional `OPENAI_BASE_URL`) | OpenAI, or any compatible host | `sk-…` (never `sk-ant-`) |
+| `OPENAI_BASE_URL` alone | A local runtime that needs no key | — |
+| none | Deterministic fallbacks; placeholders, no cost | — |
+
+**The variable must match the key.** Selection is by which variable is set, not
+by inspecting the key, so an OpenAI key in `ANTHROPIC_API_KEY` selects the
+Anthropic backend and fails with a 401 partway through the run. A warning now
+flags a mismatched prefix before any request is made.
 
 ### Option A — a local model, no API cost at all
 
@@ -131,9 +162,10 @@ Qwen2.5-Coder, Llama 3.1+ and Mistral all support it.
 
 ### Option B — OpenAI
 
-```cmd
-set OPENAI_API_KEY=sk-...
-set OPENAI_MODEL=gpt-4o-mini
+```powershell
+$env:OPENAI_API_KEY="sk-..."
+$env:OPENAI_MODEL="gpt-4o-mini"
+$env:ANTHROPIC_API_KEY=""   # whichever is set first wins; clear the one you are not using
 ```
 
 Optionally route tiers separately with `OPENAI_MODEL_FAST`,
@@ -208,13 +240,35 @@ go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
 The binary lands in `%USERPROFILE%\go\bin`. If that is not on your PATH, either
 add it or reference the binary directly in the command below.
 
+That module needs Go 1.25 or newer. If yours is older the toolchain downloads
+what it needs automatically, unless you have set `GOTOOLCHAIN=local`.
+
+### Make a token
+
+github.com → Settings → Developer settings → Personal access tokens. A
+fine-grained token with **Contents: Read-only** on the repositories you want is
+enough; a classic token needs only `public_repo` for public repositories. This
+program never sees the token — GitHub's server reads it from the environment.
+
 ### Configure
 
 **MCP and the model backend are independent.** MCP is how the agent *reads
 code*; the model backend is how it *reasons about it*. Neither needs the other.
 
+```powershell
+# PowerShell — reading code over MCP is all Level 3 requires
+$env:GITHUB_PERSONAL_ACCESS_TOKEN="ghp_..."
+$env:GITHUB_MCP_COMMAND="github-mcp-server stdio"
+
+# Optional but worth setting. GitHub ships get_repository_tree in the "git"
+# toolset, which is OFF by default. With it, the whole file listing arrives in
+# one call; without it, the listing is built by walking directories through
+# get_file_contents — one call per directory. Both work.
+$env:GITHUB_TOOLSETS="repos,git"
+```
+
 ```cmd
-:: Reading code over MCP — this is all Level 3 requires
+:: cmd.exe — note the value is NOT quoted
 set GITHUB_PERSONAL_ACCESS_TOKEN=ghp_...
 set GITHUB_MCP_COMMAND=github-mcp-server stdio
 ```
@@ -226,9 +280,10 @@ reasoning about the code yet. `-mcp-check` needs no model key whatsoever.
 Add a model backend from Level 1 — `OPENAI_API_KEY`, `OPENAI_BASE_URL` for a
 local model, or `ANTHROPIC_API_KEY` — only when you want real scenarios:
 
-```cmd
-set OPENAI_API_KEY=sk-...
-set OPENAI_MODEL=gpt-4o-mini
+```powershell
+$env:OPENAI_API_KEY="sk-..."
+$env:OPENAI_MODEL="gpt-4o-mini"
+$env:ANTHROPIC_API_KEY=""   # whichever is set first wins; clear the one you are not using
 ```
 
 Note the GitHub variable is `GITHUB_PERSONAL_ACCESS_TOKEN`, not `GITHUB_TOKEN`,
@@ -238,13 +293,13 @@ environment, so setting it here is enough.
 
 If the binary is not on PATH:
 
-```cmd
-set GITHUB_MCP_COMMAND=%USERPROFILE%\go\bin\github-mcp-server.exe stdio
+```powershell
+$env:GITHUB_MCP_COMMAND="$env:USERPROFILE\go\bin\github-mcp-server.exe stdio"
 ```
 
 ### Preflight — always run this first
 
-```cmd
+```powershell
 go run ./cmd/testplan -github https://github.com/gin-gonic/gin -mcp-check
 ```
 
@@ -259,6 +314,8 @@ catalogue     N tools
               - get_file_contents
               ...
 resolved      tree="get_repository_tree" file="get_file_contents"
+              tree accepts: owner, recursive, repo, tree_sha
+              file accepts: owner, path, ref, repo
 tree          130 files
 read          BENCHMARKS.md (... bytes)
 
@@ -270,9 +327,13 @@ instead of a mysterious mid-pipeline crash.
 
 ### Run
 
-```cmd
+```powershell
 go run ./cmd/testplan -github https://github.com/gin-gonic/gin -v -out plan.md
 ```
+
+gin is 130+ analysable files. To rehearse on something smaller first, point at a
+subdirectory of any repo with `-source`, or raise `-max-files` when you are ready
+for the whole thing.
 
 Source links are derived from the URL automatically, so `-link-base` is not
 needed here. A branch in the URL is honoured:
@@ -308,13 +369,16 @@ scenarios are placeholders. Serving MCP does not itself need a model key.
 | `-mcp-tool-tree` | auto | Override the remote tree-listing tool |
 | `-mcp-tool-file` | auto | Override the remote file-reading tool |
 | `-name` | derived | Repository name shown in the report |
-| `-out` | stdout | Write the report to a file |
+| `-out` | derived | Write to this exact path, overwriting it. **Omit it** to get `reports/<repo>_<commit>_<time>.md` and `.html`, so runs accumulate instead of clobbering each other |
+| `-out-dir` | `reports` | Where generated names go when `-out` is not given |
+| `-format` | `both` | `md`, `html`, `both`, or `stdout` |
 | `-link-base` | derived for `-github` | Base URL for source links |
 | `-checkpoints` | off | Directory for per-phase blackboard snapshots |
 | `-max-files` | 400 | Refuse repositories above this size |
 | `-concurrency` | 4 | Analyst fan-out width |
 | `-revision-rounds` | 2 | Maximum Author ⇄ Critic rounds |
-| `-v` | off | Log phase progress to stderr |
+| `-v` | **on** | Log phase progress to stderr (progress is on by default) |
+| `-quiet` | off | Suppress progress; print only errors and the final path |
 
 Environment:
 
@@ -342,6 +406,8 @@ GitHub variables affect *where it reads from*. Set either, both, or neither.
 |---|---|---|
 | `no such directory. Check the path exists` | `-source` points nowhere | Clone first, or check the path. Windows paths need `\` |
 | `'$env:VAR' is not recognized` | PowerShell syntax in cmd.exe | Use `set VAR=value`, no quotes |
+| `'-link-base' is not recognized as the name of a cmdlet` | `^` line continuation used in PowerShell | Use a backtick `` ` ``, or put the command on one line |
+| Variables set with `set`, but the no-backend banner still appears | `set` in PowerShell does not set environment variables | Use ``$env:NAME="value"`` |
 | Scenarios are placeholders, Gaps says "no model provider" | No backend variable set in **this** terminal | Every run prints its backend to stderr. A `!! NO MODEL BACKEND CONFIGURED` banner names exactly what to set. Installing Ollama is not enough — `OPENAI_BASE_URL` must be set too |
 | Phases complete but emit nothing, with a local model | The model does not support tool calling | Use a tool-calling model: Qwen2.5-Coder, Llama 3.1+, Mistral |
 | `'ollama' is not recognized` | Ollama is not installed, or the terminal predates the install | Install from ollama.com/download, then **open a new terminal** |
@@ -350,9 +416,27 @@ GitHub variables affect *where it reads from*. Set either, both, or neither.
 | `model not found` / `invalid model` | A built-in model identifier has gone stale | Set `ANTHROPIC_MODEL` or `OPENAI_MODEL` to a current one |
 | `-github needs a GitHub MCP server` | `GITHUB_MCP_COMMAND` unset | See level 3. The error prints the exact commands |
 | `could not start the MCP server` | Binary not on PATH | Use the full path to `github-mcp-server.exe` |
-| `server offers no tool for listing a repository tree` | Unfamiliar server vocabulary | The error lists every tool it *does* offer; pass `-mcp-tool-tree` / `-mcp-tool-file` |
+| `server offers no tool for reading a file` | Unfamiliar server vocabulary | The error lists every tool it *does* offer; pass `-mcp-tool-file` |
+| `decode tree ([{"name":"benchmarks","sha":...` | Fixed in this build | Resolution matched `list_branches` and got branches instead of files. It no longer can, and a missing tree tool now falls back to walking directories |
+| `analyst: <file> stopped: reached 8 iterations` on every file | Fixed in this build | The prompts named tools with dots (`analysis.emit_component`) while the OpenAI adapter offered them with underscores, so the model was told to call something absent from its own tool list. Tools are now named with underscores everywhere and a test asserts prompt and tool list agree |
+| `analyst: <file> stopped: … [called: repo_read_file×8]` | Fixed in this build | Results over 4 KB were digested and replaced by a handle no tool could resolve, so the model re-read the file instead. Ordinary reads no longer spill, and `context_fetch` resolves a handle when one is issued |
+| `[called: repo_read_file×7, code_parse_go×1]` on every file | Fixed in this build | Files read over MCP came back empty: the client understood only `text` content blocks and GitHub returns an embedded `resource`. Every block type is now handled, and an unreadable reply is an error rather than an empty string |
+| `used 81108 tokens of 60000 [called: context_fetch×5]` | Fixed in this build | A large file rendered past the spill threshold, was digested, and got fetched back in pieces that were re-sent every turn. Reads are now byte-capped below that threshold, so no fetch is needed |
+| The report keeps landing in `plan.md` | `-out plan.md` is on the command line | `-out` means that exact path. Drop it and each run writes `reports/<repo>_<commit>_<time>.md` and `.html` |
+| `revision round 1: 1 findings, 1 blocking` then a long pause | Fixed in this build | Authoring was sequential with no per-risk output, and a revision re-ran every risk. It now fans out, prints each risk as it finishes, and revises only what was flagged |
+| One banner line and then nothing for minutes | Older build, or `-quiet` | Progress is on by default now. A gin-sized run takes several minutes; the phase and per-file lines are what tell you it is alive |
+| Banner names a model you did not configure | Fixed in this build | It reported only the analysis tier. It now lists every role's model whenever they differ |
+| `429` on a few risks even with retry | Fixed in this build | Each agent retried independently and they collided again. A rate limit belongs to the account, so one now pauses every concurrent caller through that provider |
+| `429: Rate limit reached ... try again in 13.94s` | Fixed earlier | OpenAI states TPM waits in the message body, not the `Retry-After` header. The adapter read only the header, backed off 500 ms, and gave up after 3 attempts. It now honours the stated wait and retries 6 times. Lower `-concurrency` also reduces how often you hit it |
+| A risk logs `failed` and then a scenario count | Fixed in this build | The count was a before/after delta on a shared blackboard, so it included other workers' output. It now counts that risk's own scenarios |
+| Any `stopped:` line | Diagnostic | The `[called: …]` suffix shows which tools the agent was calling and how often — a histogram dominated by one tool means it never got what it asked for |
+| `analyst: <file> stopped: reached 8 iterations` (older build) | Earlier build | The read tool invited the model to page through large files and pointed it at a `repo_tree` it did not have. Both fixed; a component that still fails now keeps its parser-derived analysis instead of vanishing |
+| `analyst: <file> fell back to structural analysis only` | Not fatal | The model did not emit for that file, so its symbols and error paths came from the parser alone. The component still appears, at low confidence, and the gap is listed in the report |
+| `tree=none — will walk directories` in `-mcp-check` | Normal | GitHub's tree tool is in the `git` toolset, off by default. The run works either way; set `GITHUB_TOOLSETS=repos,git` to make it one call instead of one per directory |
 | `repository has N analysable files, above the ceiling of 400` | Repository too large | Raise `-max-files`, or point `-source` at a subdirectory |
 | `credit balance is too low` | No Console credits | Add credits at console.anthropic.com. A Pro/Max plan is separate |
+| `anthropic: 401 authentication_error: API key is invalid` | An OpenAI key is in `ANTHROPIC_API_KEY` | Clear it and use `OPENAI_API_KEY`. Anthropic keys begin `sk-ant-`; OpenAI keys do not. A warning now names this before the run |
+| `openai-compatible: 400: Invalid 'tools[0].function.name'` | Fixed in this build | OpenAI rejects the dots in tool names like `repo_read_file`. The adapter now translates them on the wire and back. If you still see it, you are on an older copy |
 | Run dies partway | Anything | With `-checkpoints`, per-phase snapshots survive in that directory |
 
 ---
@@ -364,7 +448,7 @@ demonstrating:
 
 **The MCP path against GitHub's real server.** It has been driven end to end over
 the real transport against a stand-in server backed by a local checkout
-(`internal/mcpx/testdata/fake_github_server.go.txt`), covering `server/discover`,
+(`internal/mcpx/fakegh`), covering `server/discover`,
 `tools/list`, tool-name resolution, base64 blob decoding and all seven phases.
 What is untested is authentication and GitHub's exact argument names.
 `-mcp-check` exists to answer that in seconds.
