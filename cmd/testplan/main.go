@@ -340,12 +340,16 @@ func defaultMCPCommand() string { return os.Getenv("GITHUB_MCP_COMMAND") }
 // Returning nil is a supported mode, not an error: every phase then runs its
 // deterministic fallback and the report says so.
 func buildProvider(logf func(format string, arguments ...any)) llm.Provider {
+	// Which backend a run used is the single most consequential fact about its
+	// output, so it is always reported — not only under -v. Silently producing
+	// placeholder scenarios is the kind of downgrade someone discovers only
+	// after showing the result to somebody else.
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
 		provider := anthropic.New(apiKey)
 		if endpointOverride := os.Getenv("ANTHROPIC_BASE_URL"); endpointOverride != "" {
 			provider.Endpoint = strings.TrimSuffix(endpointOverride, "/") + "/v1/messages"
 		}
-		logf("model backend: anthropic")
+		fmt.Fprintln(os.Stderr, "model backend: anthropic")
 		return provider
 	}
 
@@ -353,13 +357,31 @@ func buildProvider(logf func(format string, arguments ...any)) llm.Provider {
 	openAIBaseURL := os.Getenv("OPENAI_BASE_URL")
 	if openAIKey != "" || openAIBaseURL != "" {
 		provider := openaicompat.New(openAIKey, openAIBaseURL, modelsFromEnvironment())
-		logf("model backend: openai-compatible at %s", provider.BaseURL)
+		fmt.Fprintf(os.Stderr, "model backend: openai-compatible at %s (model %s)\n",
+			provider.BaseURL, provider.Models[llm.TierBalanced])
 		return provider
 	}
 
-	logf("no model backend configured; running with deterministic fallbacks only")
+	fmt.Fprint(os.Stderr, noModelBackendWarning)
 	return nil
 }
+
+// noModelBackendWarning names every variable that would fix the situation,
+// because "no model backend" is only useful if you know what to set.
+const noModelBackendWarning = `
+!! NO MODEL BACKEND CONFIGURED
+!! Scenarios will be structural placeholders, not real test scenarios.
+!! Set one of these in THIS terminal, then run again:
+!!
+!!   local model (free):  set OPENAI_BASE_URL=http://localhost:11434/v1
+!!                        set OPENAI_MODEL=qwen2.5-coder:7b
+!!   OpenAI:              set OPENAI_API_KEY=sk-...
+!!   Anthropic:           set ANTHROPIC_API_KEY=sk-ant-...
+!!
+!! Installing Ollama is not enough on its own; OPENAI_BASE_URL must be set too.
+!! On Windows cmd the value must not be quoted. Check with: echo %OPENAI_BASE_URL%
+
+`
 
 // modelsFromEnvironment reads the tier mapping. OPENAI_MODEL sets all three,
 // which is what a local runtime wants; the per-tier variables override it.

@@ -56,7 +56,7 @@ go build ./...
 go test ./...
 ```
 
-Expect every package `ok`, 134 tests. This exercises the whole control layer —
+Expect every package `ok`, 137 tests. This exercises the whole control layer —
 guards, retry, circuit breaker, MCP client and server against each other,
 the Anthropic wire format against a local HTTP stub — with no network and no
 credentials.
@@ -110,6 +110,14 @@ ollama pull qwen2.5-coder:7b
 set OPENAI_BASE_URL=http://localhost:11434/v1
 set OPENAI_MODEL=qwen2.5-coder:7b
 go run ./cmd/testplan -source testdata\fixtures\paymentsvc -v -out plan.md
+```
+
+Every run prints which backend it selected. Look for this line before anything
+else — if you see the `!! NO MODEL BACKEND CONFIGURED` banner instead, the
+variable did not reach this terminal:
+
+```
+model backend: openai-compatible at http://localhost:11434/v1 (model qwen2.5-coder:7b)
 ```
 
 Requirements: Windows 10 22H2 or newer, ~5 GB of disk for a 7B model, and
@@ -315,7 +323,7 @@ GitHub variables affect *where it reads from*. Set either, both, or neither.
 |---|---|---|
 | `no such directory. Check the path exists` | `-source` points nowhere | Clone first, or check the path. Windows paths need `\` |
 | `'$env:VAR' is not recognized` | PowerShell syntax in cmd.exe | Use `set VAR=value`, no quotes |
-| Scenarios are placeholders, Gaps says "no model provider" | No backend variable set in this shell | Run with `-v`; the first line names the backend it chose |
+| Scenarios are placeholders, Gaps says "no model provider" | No backend variable set in **this** terminal | Every run prints its backend to stderr. A `!! NO MODEL BACKEND CONFIGURED` banner names exactly what to set. Installing Ollama is not enough — `OPENAI_BASE_URL` must be set too |
 | Phases complete but emit nothing, with a local model | The model does not support tool calling | Use a tool-calling model: Qwen2.5-Coder, Llama 3.1+, Mistral |
 | `'ollama' is not recognized` | Ollama is not installed, or the terminal predates the install | Install from ollama.com/download, then **open a new terminal** |
 | `connection refused` on port 11434 | Ollama is not running | On Windows it starts automatically; check with `curl http://localhost:11434/v1/models` |

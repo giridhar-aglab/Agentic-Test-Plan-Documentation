@@ -3,7 +3,7 @@
 A multi-agent system in Go that reads a repository and produces a test planning
 document. Architecture doc: `claude/architecture.md` in the project.
 
-**Status: all seven phases implemented. 134 tests, `go vet` clean, zero dependencies.**
+**Status: all seven phases implemented. 137 tests, `go vet` clean, zero dependencies.**
 
 Setup, troubleshooting and a level-by-level verification ladder:
 **[SETUP.md](SETUP.md)**. On Windows, `run-demo.bat` walks the same ladder and
@@ -12,7 +12,7 @@ tells you which credentials are missing.
 ## Run it
 
 ```bash
-go test ./...                                                     # 134 tests
+go test ./...                                                     # 137 tests
 
 # Local directory, no API key — every phase runs with deterministic fallbacks
 go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v

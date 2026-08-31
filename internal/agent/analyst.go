@@ -77,12 +77,23 @@ func (analyst *Analyst) Analyse(ctx context.Context, blackboard *memory.Blackboa
 	workQueue := make(chan model.SourceFile)
 	var waitGroup sync.WaitGroup
 
+	// Failure reasons are collected so that a phase which fails on everything
+	// can say *why* rather than only that it did. The reason is almost always
+	// the same for every component — an unreachable endpoint, a bad key — and
+	// making the user open the report to find that out is a poor trade.
+	var reasonMutex sync.Mutex
+	failureReasons := []string{}
+
 	for workerNumber := 0; workerNumber < concurrency; workerNumber++ {
 		waitGroup.Add(1)
 		go func() {
 			defer waitGroup.Done()
 			for sourceFile := range workQueue {
-				analyst.analyseOne(ctx, blackboard, sourceFile)
+				if reason := analyst.analyseOne(ctx, blackboard, sourceFile); reason != "" {
+					reasonMutex.Lock()
+					failureReasons = append(failureReasons, reason)
+					reasonMutex.Unlock()
+				}
 			}
 		}()
 	}
@@ -102,12 +113,45 @@ dispatch:
 	// at all was learned, because a plan covering most of a repository with an
 	// honest gaps section is worth more than no plan.
 	if len(blackboard.ComponentModels()) == 0 {
+		if commonReason := mostCommonReason(failureReasons); commonReason != "" {
+			return fmt.Errorf("analyst: no component was analysed successfully. Every attempt failed with: %s",
+				commonReason)
+		}
 		return fmt.Errorf("analyst: no component was analysed successfully")
 	}
 	return nil
 }
 
-func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Blackboard, sourceFile model.SourceFile) {
+// mostCommonReason picks the failure that explains the most components, so the
+// message names the actual cause instead of an arbitrary one.
+func mostCommonReason(reasons []string) string {
+	if len(reasons) == 0 {
+		return ""
+	}
+	countByReason := map[string]int{}
+	for _, reason := range reasons {
+		countByReason[summariseReason(reason)]++
+	}
+	bestReason, bestCount := "", 0
+	for reason, count := range countByReason {
+		if count > bestCount || (count == bestCount && reason < bestReason) {
+			bestReason, bestCount = reason, count
+		}
+	}
+	return bestReason
+}
+
+// summariseReason strips the per-component prefix so identical causes group
+// together rather than looking like distinct failures.
+func summariseReason(reason string) string {
+	if _, afterCompletion, found := strings.Cut(reason, "completion: "); found {
+		return afterCompletion
+	}
+	return reason
+}
+
+// analyseOne returns a failure reason, or "" when the component was recorded.
+func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Blackboard, sourceFile model.SourceFile) string {
 	componentRegistry := tool.NewRegistry()
 	componentRegistry.Register(&repo.ReadFileTool{Source: analyst.Source, MaxLines: 400}, tool.NetworkPolicy())
 	componentRegistry.Register(&code.ParseGoTool{Source: analyst.Source}, tool.LocalPolicy())
@@ -153,7 +197,7 @@ func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Black
 	if err != nil {
 		blackboard.NoteGap(analyst.Name(), sourceFile.Path, "analysis failed: "+err.Error())
 		analyst.logf("analyst: %s failed: %v", sourceFile.Path, err)
-		return
+		return err.Error()
 	}
 	if outcome.StoppedBy != nil {
 		blackboard.NoteGap(analyst.Name(), sourceFile.Path,
@@ -165,9 +209,12 @@ func (analyst *Analyst) analyseOne(ctx context.Context, blackboard *memory.Black
 	// recorded. Checking the blackboard rather than trusting the outcome is the
 	// same principle as a phase postcondition, one level down.
 	if !analyst.componentWasRecorded(blackboard, sourceFile.Path) {
-		blackboard.NoteGap(analyst.Name(), sourceFile.Path,
-			"the analyst finished without recording an analysis")
+		const reason = "the analyst finished without recording an analysis " +
+			"(the model may not support tool calling)"
+		blackboard.NoteGap(analyst.Name(), sourceFile.Path, reason)
+		return reason
 	}
+	return ""
 }
 
 func (analyst *Analyst) componentWasRecorded(blackboard *memory.Blackboard, filePath string) bool {
