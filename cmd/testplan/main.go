@@ -349,7 +349,9 @@ func buildProvider(logf func(format string, arguments ...any)) llm.Provider {
 		if endpointOverride := os.Getenv("ANTHROPIC_BASE_URL"); endpointOverride != "" {
 			provider.Endpoint = strings.TrimSuffix(endpointOverride, "/") + "/v1/messages"
 		}
-		fmt.Fprintln(os.Stderr, "model backend: anthropic")
+		provider.Models = anthropicModelsFromEnvironment()
+		fmt.Fprintf(os.Stderr, "model backend: anthropic (model %s)\n",
+			provider.Models[llm.TierBalanced])
 		return provider
 	}
 
@@ -382,6 +384,28 @@ const noModelBackendWarning = `
 !! On Windows cmd the value must not be quoted. Check with: echo %OPENAI_BASE_URL%
 
 `
+
+// anthropicModelsFromEnvironment lets a stale built-in identifier be corrected
+// without a rebuild. ANTHROPIC_MODEL sets all three; the per-tier variables
+// override it individually.
+func anthropicModelsFromEnvironment() anthropic.ModelsByTier {
+	models := anthropic.DefaultModels()
+	if singleModel := os.Getenv("ANTHROPIC_MODEL"); singleModel != "" {
+		models = anthropic.ModelsByTier{
+			llm.TierFast: singleModel, llm.TierBalanced: singleModel, llm.TierStrong: singleModel,
+		}
+	}
+	for tier, variableName := range map[llm.Tier]string{
+		llm.TierFast:     "ANTHROPIC_MODEL_FAST",
+		llm.TierBalanced: "ANTHROPIC_MODEL_BALANCED",
+		llm.TierStrong:   "ANTHROPIC_MODEL_STRONG",
+	} {
+		if override := os.Getenv(variableName); override != "" {
+			models[tier] = override
+		}
+	}
+	return models
+}
 
 // modelsFromEnvironment reads the tier mapping. OPENAI_MODEL sets all three,
 // which is what a local runtime wants; the per-tier variables override it.

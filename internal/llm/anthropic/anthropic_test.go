@@ -70,8 +70,8 @@ func TestCompleteTranslatesToolUseInBothDirections(t *testing.T) {
 
 	// Outbound: the tier must resolve to a model, and a tool result must become
 	// a user-role block, which is the one asymmetry in this API.
-	if capturedBody["model"] != "claude-sonnet-4-5" {
-		t.Errorf("tier should resolve to a model, got %v", capturedBody["model"])
+	if capturedBody["model"] != DefaultModels()[llm.TierBalanced] {
+		t.Errorf("tier should resolve to the configured model, got %v", capturedBody["model"])
 	}
 	wireMessages, _ := capturedBody["messages"].([]any)
 	if len(wireMessages) != 3 {

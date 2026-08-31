@@ -152,7 +152,13 @@ func generatePlan(
 // entrypoints honour the same configuration.
 func providerFromEnvironment() llm.Provider {
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
-		return anthropic.New(apiKey)
+		provider := anthropic.New(apiKey)
+		if singleModel := os.Getenv("ANTHROPIC_MODEL"); singleModel != "" {
+			provider.Models = anthropic.ModelsByTier{
+				llm.TierFast: singleModel, llm.TierBalanced: singleModel, llm.TierStrong: singleModel,
+			}
+		}
+		return provider
 	}
 	openAIKey := os.Getenv("OPENAI_API_KEY")
 	openAIBaseURL := os.Getenv("OPENAI_BASE_URL")

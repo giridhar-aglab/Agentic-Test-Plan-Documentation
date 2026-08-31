@@ -33,11 +33,15 @@ type ModelsByTier map[llm.Tier]string
 // DefaultModels is the shipped mapping. Cheap deterministic phases and
 // expensive reasoning phases route independently, which is most of the cost
 // control in the system.
+//
+// Model identifiers change faster than this code will, so treat these as a
+// starting point rather than a guarantee: ANTHROPIC_MODEL and the per-tier
+// variables override every one of them without a rebuild.
 func DefaultModels() ModelsByTier {
 	return ModelsByTier{
-		llm.TierFast:     "claude-haiku-4-5",
-		llm.TierBalanced: "claude-sonnet-4-5",
-		llm.TierStrong:   "claude-opus-4-5",
+		llm.TierFast:     "claude-haiku-4-5-20251001",
+		llm.TierBalanced: "claude-sonnet-5",
+		llm.TierStrong:   "claude-opus-5",
 	}
 }
 

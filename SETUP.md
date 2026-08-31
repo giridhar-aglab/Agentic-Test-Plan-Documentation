@@ -150,6 +150,23 @@ set ANTHROPIC_API_KEY=sk-ant-...
 [console.anthropic.com](https://console.anthropic.com) → credits under Settings
 → Billing → key under Settings → API Keys.
 
+Model identifiers change faster than this code does. The built-in defaults are a
+starting point, not a guarantee — if a run fails with *model not found*, correct
+it without rebuilding:
+
+```cmd
+:: one model for every tier — cheapest, good for a first run
+set ANTHROPIC_MODEL=claude-haiku-4-5-20251001
+
+:: or per tier
+set ANTHROPIC_MODEL_FAST=claude-haiku-4-5-20251001
+set ANTHROPIC_MODEL_BALANCED=claude-sonnet-5
+set ANTHROPIC_MODEL_STRONG=claude-opus-5
+```
+
+The first line every run prints names the model it chose, so a wrong identifier
+is visible immediately.
+
 ### Why a subscription does not work here
 
 Claude Pro/Max and ChatGPT Plus authorise **their own first-party clients** —
@@ -305,6 +322,8 @@ Environment:
 |---|---|
 | `ANTHROPIC_API_KEY` | Use the Anthropic backend |
 | `ANTHROPIC_BASE_URL` | Override the Anthropic endpoint |
+| `ANTHROPIC_MODEL` | Model for all tiers |
+| `ANTHROPIC_MODEL_FAST` / `_BALANCED` / `_STRONG` | Per-tier overrides |
 | `OPENAI_API_KEY` | Use an OpenAI-compatible backend |
 | `OPENAI_BASE_URL` | Endpoint for that backend (e.g. `http://localhost:11434/v1`) |
 | `OPENAI_MODEL` | Model for all tiers |
@@ -328,6 +347,7 @@ GitHub variables affect *where it reads from*. Set either, both, or neither.
 | `'ollama' is not recognized` | Ollama is not installed, or the terminal predates the install | Install from ollama.com/download, then **open a new terminal** |
 | `connection refused` on port 11434 | Ollama is not running | On Windows it starts automatically; check with `curl http://localhost:11434/v1/models` |
 | `no model configured for tier` | `OPENAI_MODEL` unset and no per-tier override | Set `OPENAI_MODEL` |
+| `model not found` / `invalid model` | A built-in model identifier has gone stale | Set `ANTHROPIC_MODEL` or `OPENAI_MODEL` to a current one |
 | `-github needs a GitHub MCP server` | `GITHUB_MCP_COMMAND` unset | See level 3. The error prints the exact commands |
 | `could not start the MCP server` | Binary not on PATH | Use the full path to `github-mcp-server.exe` |
 | `server offers no tool for listing a repository tree` | Unfamiliar server vocabulary | The error lists every tool it *does* offer; pass `-mcp-tool-tree` / `-mcp-tool-file` |
