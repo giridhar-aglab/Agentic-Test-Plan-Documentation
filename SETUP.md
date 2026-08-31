@@ -90,21 +90,36 @@ Selection is by environment, first match wins:
 
 ### Option A — a local model, no API cost at all
 
-Install [Ollama](https://ollama.com), pull a model that supports tool calling,
-and point the agent at it. Nothing is billed, ever.
+**Ollama is a separate program and must be installed first.** `ollama` is not a
+Go command; if the shell says *"the term 'ollama' is not recognized"*, it is not
+installed yet.
+
+1. Download the installer from [ollama.com/download](https://ollama.com/download)
+   and run `OllamaSetup.exe`. It installs into your user account and needs no
+   administrator rights.
+2. **Close and reopen your terminal** so the new PATH is picked up. This is the
+   most common reason the command is still not found after installing.
+3. Confirm: `ollama --version`
+
+On Windows the installer leaves Ollama running in the background, so
+**`ollama serve` is not needed** — it is already listening on port 11434.
 
 ```cmd
 ollama pull qwen2.5-coder:7b
-ollama serve
 
 set OPENAI_BASE_URL=http://localhost:11434/v1
 set OPENAI_MODEL=qwen2.5-coder:7b
 go run ./cmd/testplan -source testdata\fixtures\paymentsvc -v -out plan.md
 ```
 
-Tool calling is the requirement — every agent emits its findings through a
-schema-constrained tool call. A model without it will produce empty phases.
-Qwen2.5-Coder, Llama 3.1+, Mistral and Firefunction all support it.
+Requirements: Windows 10 22H2 or newer, ~5 GB of disk for a 7B model, and
+enough memory to hold it. Without a GPU it runs on CPU — correct, but slow
+enough that a large repository is impractical. Check the server is up with
+`curl http://localhost:11434/v1/models` before running the pipeline.
+
+Tool calling is the hard requirement — every agent emits its findings through a
+schema-constrained tool call, so a model without it produces empty phases.
+Qwen2.5-Coder, Llama 3.1+ and Mistral all support it.
 
 ### Option B — OpenAI
 
@@ -279,6 +294,8 @@ Environment:
 | `'$env:VAR' is not recognized` | PowerShell syntax in cmd.exe | Use `set VAR=value`, no quotes |
 | Scenarios are placeholders, Gaps says "no model provider" | No backend variable set in this shell | Run with `-v`; the first line names the backend it chose |
 | Phases complete but emit nothing, with a local model | The model does not support tool calling | Use a tool-calling model: Qwen2.5-Coder, Llama 3.1+, Mistral |
+| `'ollama' is not recognized` | Ollama is not installed, or the terminal predates the install | Install from ollama.com/download, then **open a new terminal** |
+| `connection refused` on port 11434 | Ollama is not running | On Windows it starts automatically; check with `curl http://localhost:11434/v1/models` |
 | `no model configured for tier` | `OPENAI_MODEL` unset and no per-tier override | Set `OPENAI_MODEL` |
 | `-github needs a GitHub MCP server` | `GITHUB_MCP_COMMAND` unset | See level 3. The error prints the exact commands |
 | `could not start the MCP server` | Binary not on PATH | Use the full path to `github-mcp-server.exe` |
