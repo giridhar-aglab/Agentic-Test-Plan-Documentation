@@ -39,6 +39,20 @@ type ErrNotFound struct{ Path string }
 
 func (notFound *ErrNotFound) Error() string { return "repo: no such path: " + notFound.Path }
 
+// ErrSourceUnavailable reports a source directory that does not exist or is not
+// a directory. It is the first thing a new user hits when a path is wrong, so
+// it says what to do rather than surfacing a raw syscall error.
+type ErrSourceUnavailable struct {
+	Path   string
+	Reason string
+}
+
+func (unavailable *ErrSourceUnavailable) Error() string {
+	return fmt.Sprintf("%s: %s. Check the path exists and is a directory "+
+		"(clone the repository first if you have not already)",
+		unavailable.Path, unavailable.Reason)
+}
+
 // LocalSource reads a directory on disk. Used for fixtures and for the
 // shallow-clone fallback when the GitHub server is unreachable.
 type LocalSource struct {
@@ -79,6 +93,22 @@ var skippedDirectoryNames = map[string]bool{
 func (localSource *LocalSource) Tree(ctx context.Context) ([]Entry, error) {
 	if localSource.cachedEntries != nil {
 		return localSource.cachedEntries, nil
+	}
+
+	// Check the root before walking. A missing directory is by far the most
+	// common first-run mistake, and the OS error for it is unreadable.
+	rootInfo, statErr := os.Stat(localSource.RootDirectory)
+	if statErr != nil {
+		if os.IsNotExist(statErr) {
+			return nil, &ErrSourceUnavailable{
+				Path: localSource.RootDirectory, Reason: "no such directory"}
+		}
+		return nil, &ErrSourceUnavailable{
+			Path: localSource.RootDirectory, Reason: statErr.Error()}
+	}
+	if !rootInfo.IsDir() {
+		return nil, &ErrSourceUnavailable{
+			Path: localSource.RootDirectory, Reason: "not a directory"}
 	}
 
 	entries := []Entry{}
