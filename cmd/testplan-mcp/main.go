@@ -23,6 +23,7 @@ import (
 	"github.com/giri-ms19/testplan-agent/internal/guard"
 	"github.com/giri-ms19/testplan-agent/internal/llm"
 	"github.com/giri-ms19/testplan-agent/internal/llm/anthropic"
+	"github.com/giri-ms19/testplan-agent/internal/llm/openaicompat"
 	"github.com/giri-ms19/testplan-agent/internal/mcpx"
 	"github.com/giri-ms19/testplan-agent/internal/memory"
 	"github.com/giri-ms19/testplan-agent/internal/pipeline"
@@ -147,10 +148,20 @@ func generatePlan(
 	return reportMarkdown, nil
 }
 
+// providerFromEnvironment mirrors the CLI's backend selection, so both
+// entrypoints honour the same configuration.
 func providerFromEnvironment() llm.Provider {
-	apiKey := os.Getenv("ANTHROPIC_API_KEY")
-	if apiKey == "" {
-		return nil
+	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
+		return anthropic.New(apiKey)
 	}
-	return anthropic.New(apiKey)
+	openAIKey := os.Getenv("OPENAI_API_KEY")
+	openAIBaseURL := os.Getenv("OPENAI_BASE_URL")
+	if openAIKey != "" || openAIBaseURL != "" {
+		modelName := os.Getenv("OPENAI_MODEL")
+		if modelName == "" {
+			modelName = "gpt-4o-mini"
+		}
+		return openaicompat.New(openAIKey, openAIBaseURL, openaicompat.SingleModel(modelName))
+	}
+	return nil
 }

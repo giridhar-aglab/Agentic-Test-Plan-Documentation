@@ -3,7 +3,7 @@
 A multi-agent system in Go that reads a repository and produces a test planning
 document. Architecture doc: `claude/architecture.md` in the project.
 
-**Status: all seven phases implemented. 124 tests, `go vet` clean, zero dependencies.**
+**Status: all seven phases implemented. 134 tests, `go vet` clean, zero dependencies.**
 
 Setup, troubleshooting and a level-by-level verification ladder:
 **[SETUP.md](SETUP.md)**. On Windows, `run-demo.bat` walks the same ladder and
@@ -12,13 +12,17 @@ tells you which credentials are missing.
 ## Run it
 
 ```bash
-go test ./...                                                     # 124 tests
+go test ./...                                                     # 134 tests
 
 # Local directory, no API key — every phase runs with deterministic fallbacks
 go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
 
-# With a model
-ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan -source /path/to/repo -out plan.md
+# With a model. The backend is a configuration choice — see SETUP.md.
+#   ANTHROPIC_API_KEY   Anthropic
+#   OPENAI_API_KEY      OpenAI or any compatible host
+#   OPENAI_BASE_URL     a local runtime (Ollama, LM Studio, vLLM) — no API cost
+OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5-coder:7b \
+  go run ./cmd/testplan -source /path/to/repo -out plan.md
 
 # GitHub over MCP — no clone. This is the intended path.
 #
@@ -127,10 +131,12 @@ package and point `-mcp-command` at it), which exercises `server/discover`,
 pipeline. What remains untested is authentication and the real server's exact
 argument names. `-mcp-check` is the preflight for exactly that.
 
-**The Anthropic adapter has not run against the live API.** It is exercised
-against `httptest` — tool-use translation both ways, `Retry-After` honouring,
-non-retryable 4xx, retry exhaustion. The wire format is written from the
-documented Messages API shape; first contact with production may need a fix.
+**Neither model adapter has run against its live API.** Both are exercised
+against `httptest` — tool-call translation in both directions, `Retry-After`
+honouring, non-retryable 4xx, retry exhaustion — and the OpenAI-compatible one
+has driven the full pipeline against a stub endpoint, producing 34 scenarios
+across 17 components with working source links. The wire formats are written
+from the documented shapes; first contact with production may need a fix.
 
 ## Not yet built
 

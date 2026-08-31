@@ -20,6 +20,7 @@ import (
 	"github.com/giri-ms19/testplan-agent/internal/guard"
 	"github.com/giri-ms19/testplan-agent/internal/llm"
 	"github.com/giri-ms19/testplan-agent/internal/llm/anthropic"
+	"github.com/giri-ms19/testplan-agent/internal/llm/openaicompat"
 	"github.com/giri-ms19/testplan-agent/internal/mcpx"
 	"github.com/giri-ms19/testplan-agent/internal/memory"
 	"github.com/giri-ms19/testplan-agent/internal/pipeline"
@@ -326,20 +327,58 @@ func checkMCPServer(ctx context.Context, options sourceOptions) error {
 // rather than repeated on every invocation.
 func defaultMCPCommand() string { return os.Getenv("GITHUB_MCP_COMMAND") }
 
-// buildProvider returns nil when no credentials are configured. A nil provider
-// is a supported mode, not an error: the pipeline runs every phase with its
-// deterministic fallback and says so in the report.
+// buildProvider picks a model backend from the environment.
+//
+// The provider abstraction exists so the vendor is a configuration choice. Any
+// OpenAI-compatible endpoint works, including a model running locally, which
+// costs nothing per run.
+//
+//	ANTHROPIC_API_KEY                 Anthropic
+//	OPENAI_API_KEY [+ OPENAI_BASE_URL] any OpenAI-compatible endpoint
+//	OPENAI_BASE_URL alone              a local runtime that needs no key
+//
+// Returning nil is a supported mode, not an error: every phase then runs its
+// deterministic fallback and the report says so.
 func buildProvider(logf func(format string, arguments ...any)) llm.Provider {
-	apiKey := os.Getenv("ANTHROPIC_API_KEY")
-	if apiKey == "" {
-		logf("no ANTHROPIC_API_KEY set; running with deterministic fallbacks only")
-		return nil
+	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
+		provider := anthropic.New(apiKey)
+		if endpointOverride := os.Getenv("ANTHROPIC_BASE_URL"); endpointOverride != "" {
+			provider.Endpoint = strings.TrimSuffix(endpointOverride, "/") + "/v1/messages"
+		}
+		logf("model backend: anthropic")
+		return provider
 	}
-	provider := anthropic.New(apiKey)
-	if endpointOverride := os.Getenv("ANTHROPIC_BASE_URL"); endpointOverride != "" {
-		provider.Endpoint = strings.TrimSuffix(endpointOverride, "/") + "/v1/messages"
+
+	openAIKey := os.Getenv("OPENAI_API_KEY")
+	openAIBaseURL := os.Getenv("OPENAI_BASE_URL")
+	if openAIKey != "" || openAIBaseURL != "" {
+		provider := openaicompat.New(openAIKey, openAIBaseURL, modelsFromEnvironment())
+		logf("model backend: openai-compatible at %s", provider.BaseURL)
+		return provider
 	}
-	return provider
+
+	logf("no model backend configured; running with deterministic fallbacks only")
+	return nil
+}
+
+// modelsFromEnvironment reads the tier mapping. OPENAI_MODEL sets all three,
+// which is what a local runtime wants; the per-tier variables override it.
+func modelsFromEnvironment() openaicompat.ModelsByTier {
+	singleModel := os.Getenv("OPENAI_MODEL")
+	if singleModel == "" {
+		singleModel = "gpt-4o-mini"
+	}
+	models := openaicompat.SingleModel(singleModel)
+	for tier, variableName := range map[llm.Tier]string{
+		llm.TierFast:     "OPENAI_MODEL_FAST",
+		llm.TierBalanced: "OPENAI_MODEL_BALANCED",
+		llm.TierStrong:   "OPENAI_MODEL_STRONG",
+	} {
+		if override := os.Getenv(variableName); override != "" {
+			models[tier] = override
+		}
+	}
+	return models
 }
 
 type fileCheckpointWriter struct{ directory string }

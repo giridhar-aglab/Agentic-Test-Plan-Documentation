@@ -14,7 +14,7 @@ so if level 2 fails you already know levels 0 and 1 were sound.
 |---|---|---|
 | Go 1.24+ | `go version` | Required. `go.mod` declares 1.24. |
 | git | `git --version` | Only for cloning this project. |
-| Anthropic API key | see level 2 | Needed for real scenarios. |
+| A model backend | see level 1 | Anthropic, **any OpenAI-compatible endpoint**, or a **local model (free)**. |
 | GitHub PAT | see level 3 | Needed for the MCP path. Private repos need `repo` scope; public repos work with a token that has no scopes. |
 
 No other dependencies. The project has **zero third-party Go modules**, so
@@ -56,7 +56,7 @@ go build ./...
 go test ./...
 ```
 
-Expect every package `ok`, 124 tests. This exercises the whole control layer —
+Expect every package `ok`, 134 tests. This exercises the whole control layer —
 guards, retry, circuit breaker, MCP client and server against each other,
 the Anthropic wire format against a local HTTP stub — with no network and no
 credentials.
@@ -73,23 +73,67 @@ section. That is correct behaviour, not a failure.
 
 ---
 
-## Level 1 — real scenarios on local code
+## Level 1 — real scenarios (pick any backend)
 
-Only `ANTHROPIC_API_KEY` is needed.
+The vendor is a configuration choice. `internal/llm.Provider` is the seam, and
+two adapters ship: Anthropic, and anything speaking the OpenAI chat-completions
+format — which includes a model running on your own machine.
+
+Selection is by environment, first match wins:
+
+| Variables | Backend |
+|---|---|
+| `ANTHROPIC_API_KEY` | Anthropic |
+| `OPENAI_API_KEY` (+ optional `OPENAI_BASE_URL`) | OpenAI, or any compatible host |
+| `OPENAI_BASE_URL` alone | A local runtime that needs no key |
+| none | Deterministic fallbacks; placeholders, no cost |
+
+### Option A — a local model, no API cost at all
+
+Install [Ollama](https://ollama.com), pull a model that supports tool calling,
+and point the agent at it. Nothing is billed, ever.
+
+```cmd
+ollama pull qwen2.5-coder:7b
+ollama serve
+
+set OPENAI_BASE_URL=http://localhost:11434/v1
+set OPENAI_MODEL=qwen2.5-coder:7b
+go run ./cmd/testplan -source testdata\fixtures\paymentsvc -v -out plan.md
+```
+
+Tool calling is the requirement — every agent emits its findings through a
+schema-constrained tool call. A model without it will produce empty phases.
+Qwen2.5-Coder, Llama 3.1+, Mistral and Firefunction all support it.
+
+### Option B — OpenAI
+
+```cmd
+set OPENAI_API_KEY=sk-...
+set OPENAI_MODEL=gpt-4o-mini
+```
+
+Optionally route tiers separately with `OPENAI_MODEL_FAST`,
+`OPENAI_MODEL_BALANCED`, `OPENAI_MODEL_STRONG`. On a local runtime one model for
+all three is usually right — there is no cheap tier when the marginal cost is
+zero.
+
+### Option C — Anthropic
 
 ```cmd
 set ANTHROPIC_API_KEY=sk-ant-...
-go run ./cmd/testplan -source testdata\fixtures\paymentsvc -name paymentsvc -v -out plan.md
 ```
 
-Now the Analyst, Author and Critic actually run. The fixture is three files, so
-this costs cents and takes seconds — the cheapest possible check that your key
-works and the Anthropic adapter talks to the live API correctly.
+[console.anthropic.com](https://console.anthropic.com) → credits under Settings
+→ Billing → key under Settings → API Keys.
 
-**Get a key:** [console.anthropic.com](https://console.anthropic.com) → add
-credits under Settings → Billing → create a key under Settings → API Keys. A
-Claude Pro or Max subscription does *not* include API credits; Console billing
-is separate.
+### Why a subscription does not work here
+
+Claude Pro/Max and ChatGPT Plus authorise **their own first-party clients** —
+claude.ai, Claude Code, the Codex CLI. This project is a third-party Go binary
+you built; neither vendor lets an arbitrary program draw on subscription quota.
+That is a billing boundary, not a limitation of this design — which is exactly
+why the provider is swappable, and why option A costs nothing.
 
 ---
 
@@ -212,8 +256,18 @@ integration works in both directions.
 | `-revision-rounds` | 2 | Maximum Author ⇄ Critic rounds |
 | `-v` | off | Log phase progress to stderr |
 
-Environment: `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL` (optional override),
-`GITHUB_MCP_COMMAND`, `GITHUB_PERSONAL_ACCESS_TOKEN` (read by the MCP server).
+Environment:
+
+| Variable | Purpose |
+|---|---|
+| `ANTHROPIC_API_KEY` | Use the Anthropic backend |
+| `ANTHROPIC_BASE_URL` | Override the Anthropic endpoint |
+| `OPENAI_API_KEY` | Use an OpenAI-compatible backend |
+| `OPENAI_BASE_URL` | Endpoint for that backend (e.g. `http://localhost:11434/v1`) |
+| `OPENAI_MODEL` | Model for all tiers |
+| `OPENAI_MODEL_FAST` / `_BALANCED` / `_STRONG` | Per-tier overrides |
+| `GITHUB_MCP_COMMAND` | Command that starts the GitHub MCP server |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | Read by that server, not by this program |
 
 ---
 
@@ -223,7 +277,9 @@ Environment: `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL` (optional override),
 |---|---|---|
 | `no such directory. Check the path exists` | `-source` points nowhere | Clone first, or check the path. Windows paths need `\` |
 | `'$env:VAR' is not recognized` | PowerShell syntax in cmd.exe | Use `set VAR=value`, no quotes |
-| Scenarios are placeholders, Gaps says "no model provider" | `ANTHROPIC_API_KEY` not set, or not visible to this shell | `echo %ANTHROPIC_API_KEY%` to confirm |
+| Scenarios are placeholders, Gaps says "no model provider" | No backend variable set in this shell | Run with `-v`; the first line names the backend it chose |
+| Phases complete but emit nothing, with a local model | The model does not support tool calling | Use a tool-calling model: Qwen2.5-Coder, Llama 3.1+, Mistral |
+| `no model configured for tier` | `OPENAI_MODEL` unset and no per-tier override | Set `OPENAI_MODEL` |
 | `-github needs a GitHub MCP server` | `GITHUB_MCP_COMMAND` unset | See level 3. The error prints the exact commands |
 | `could not start the MCP server` | Binary not on PATH | Use the full path to `github-mcp-server.exe` |
 | `server offers no tool for listing a repository tree` | Unfamiliar server vocabulary | The error lists every tool it *does* offer; pass `-mcp-tool-tree` / `-mcp-tool-file` |
@@ -245,10 +301,13 @@ the real transport against a stand-in server backed by a local checkout
 What is untested is authentication and GitHub's exact argument names.
 `-mcp-check` exists to answer that in seconds.
 
-**The Anthropic adapter against the live API.** Tested against a local HTTP stub
-for tool-use translation both ways, `Retry-After` honouring, non-retryable 4xx
-and retry exhaustion. Level 1 is the cheapest way to find out — three files,
-seconds, cents.
+**Both model adapters against their live APIs.** Each is tested against a local
+HTTP stub covering tool-call translation in both directions, `Retry-After`
+honouring, non-retryable 4xx and retry exhaustion. The OpenAI-compatible adapter
+has additionally driven the full pipeline end to end against a stub endpoint,
+producing 34 scenarios across 17 components of `gin/binding` with working source
+links. Level 1 against the three-file fixture is the cheapest way to confirm
+either one for real.
 
 One known calibration issue: risk *levels* are miscalibrated on large
 repositories — 12 of 58 gin components come out "critical" because the
