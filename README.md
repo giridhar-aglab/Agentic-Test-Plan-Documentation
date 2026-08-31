@@ -3,12 +3,12 @@
 A multi-agent system in Go that reads a repository and produces a test planning
 document. Architecture doc: `claude/architecture.md` in the project.
 
-**Status: all seven phases implemented. 116 tests, `go vet` clean, zero dependencies.**
+**Status: all seven phases implemented. 124 tests, `go vet` clean, zero dependencies.**
 
 ## Run it
 
 ```bash
-go test ./...                                                     # 116 tests
+go test ./...                                                     # 124 tests
 
 # Local directory, no API key — every phase runs with deterministic fallbacks
 go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
@@ -16,10 +16,14 @@ go run ./cmd/testplan -source testdata/fixtures/paymentsvc -name paymentsvc -v
 # With a model
 ANTHROPIC_API_KEY=sk-... go run ./cmd/testplan -source /path/to/repo -out plan.md
 
-# GitHub — paste any repo URL
+# GitHub over MCP — no clone. This is the intended path.
 export ANTHROPIC_API_KEY=sk-...
 export GITHUB_TOKEN=ghp_...                                   # private repos
 export GITHUB_MCP_COMMAND="npx -y @modelcontextprotocol/server-github"
+
+# Preflight: connect, list the catalogue, fetch one file, exit. Run this first.
+go run ./cmd/testplan -github https://github.com/owner/repo -mcp-check
+
 go run ./cmd/testplan -github https://github.com/owner/repo -out plan.md
 
 # A branch in the URL is honoured; -ref overrides it
@@ -100,6 +104,14 @@ extension. Upside: zero dependencies. Downside: it tracks only the subset of the
 spec this system uses, and swapping in the real SDK later is a rewrite of one
 package. Verified against a loopback server and by driving `cmd/testplan-mcp` as
 a real subprocess.
+
+**The MCP path has not met a live GitHub MCP server.** It has been driven end to
+end over the real transport against a stand-in server backed by a local checkout
+(`internal/mcpx/testdata/fake_github_server.go.txt` — build it as a `main`
+package and point `-mcp-command` at it), which exercises `server/discover`,
+`tools/list`, tool-name resolution, base64 blob decoding and the full seven-phase
+pipeline. What remains untested is authentication and the real server's exact
+argument names. `-mcp-check` is the preflight for exactly that.
 
 **The Anthropic adapter has not run against the live API.** It is exercised
 against `httptest` — tool-use translation both ways, `Retry-After` honouring,

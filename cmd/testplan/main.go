@@ -49,6 +49,10 @@ func run() error {
 	concurrency := flag.Int("concurrency", 4, "analyst fan-out width")
 	revisionRounds := flag.Int("revision-rounds", 2, "maximum author/critic rounds")
 	sourceLinkBase := flag.String("link-base", "", "base URL for source links, e.g. https://github.com/owner/repo/blob/main")
+	mcpCheck := flag.Bool("mcp-check", false,
+		"connect to the GitHub MCP server, report what it offers, and exit without running the pipeline")
+	mcpToolTree := flag.String("mcp-tool-tree", "", "override the remote tool used to list the repository tree")
+	mcpToolFile := flag.String("mcp-tool-file", "", "override the remote tool used to read a file")
 	verbose := flag.Bool("v", false, "log phase progress")
 	flag.Parse()
 
@@ -62,8 +66,22 @@ func run() error {
 		}
 	}
 
-	source, displayName, commitSHA, closeSource, err := buildSource(ctx,
-		*sourceDirectory, *githubRepository, *githubRef, *mcpCommand, *maxFiles, *repositoryName)
+	sourceOptions := sourceOptions{
+		LocalDirectory: *sourceDirectory,
+		GitHubTarget:   *githubRepository,
+		Ref:            *githubRef,
+		MCPCommand:     *mcpCommand,
+		MaxFiles:       *maxFiles,
+		DisplayName:    *repositoryName,
+		ToolOverrides:  mcpx.GitHubToolNames{Tree: *mcpToolTree, GetFile: *mcpToolFile},
+		CheckOnly:      *mcpCheck,
+		Logf:           logf,
+	}
+	if *mcpCheck {
+		return checkMCPServer(ctx, sourceOptions)
+	}
+
+	source, displayName, commitSHA, closeSource, err := buildSource(ctx, sourceOptions)
 	if err != nil {
 		return err
 	}
@@ -134,64 +152,170 @@ func run() error {
 	return nil
 }
 
+// sourceOptions carries everything the source constructors need, so adding a
+// knob does not mean threading another positional argument through.
+type sourceOptions struct {
+	LocalDirectory string
+	GitHubTarget   string
+	Ref            string
+	MCPCommand     string
+	MaxFiles       int
+	DisplayName    string
+	ToolOverrides  mcpx.GitHubToolNames
+	CheckOnly      bool
+	Logf           func(format string, arguments ...any)
+}
+
 // buildSource picks between a local directory and GitHub over MCP. Both satisfy
 // repo.Source, so this function is the only place that knows the difference.
-func buildSource(
-	ctx context.Context,
-	sourceDirectory, githubRepository, githubRef, mcpCommand string,
-	maxFiles int, repositoryName string,
-) (repo.Source, string, string, func(), error) {
+func buildSource(ctx context.Context, options sourceOptions) (repo.Source, string, string, func(), error) {
 	noop := func() {}
 
-	if githubRepository == "" {
-		absoluteSource, err := filepath.Abs(sourceDirectory)
+	if options.GitHubTarget == "" {
+		absoluteSource, err := filepath.Abs(options.LocalDirectory)
 		if err != nil {
 			return nil, "", "", noop, fmt.Errorf("resolve source: %w", err)
 		}
-		displayName := repositoryName
+		displayName := options.DisplayName
 		if displayName == "" {
 			displayName = filepath.Base(absoluteSource)
 		}
-		return repo.NewLocalSource(absoluteSource, maxFiles), displayName,
+		return repo.NewLocalSource(absoluteSource, options.MaxFiles), displayName,
 			currentCommitSHA(absoluteSource), noop, nil
 	}
 
-	reference, err := mcpx.ParseRepositoryReference(githubRepository)
+	reference, client, closeClient, err := connectToGitHub(ctx, options)
 	if err != nil {
-		return nil, "", "", noop, fmt.Errorf("-github: %w", err)
+		return nil, "", "", noop, err
+	}
+
+	// Ask the server what it actually offers rather than assuming a naming
+	// convention. Explicit overrides still win.
+	resolvedToolNames, resolveErr := mcpx.ResolveToolNames(ctx, client)
+	if options.ToolOverrides.Tree != "" {
+		resolvedToolNames.Tree = options.ToolOverrides.Tree
+	}
+	if options.ToolOverrides.GetFile != "" {
+		resolvedToolNames.GetFile = options.ToolOverrides.GetFile
+	}
+	if resolvedToolNames.Tree == "" || resolvedToolNames.GetFile == "" {
+		closeClient()
+		return nil, "", "", noop, resolveErr
+	}
+	options.Logf("mcp: using %s", resolvedToolNames.Describe())
+
+	displayName := options.DisplayName
+	if displayName == "" {
+		displayName = reference.Slug()
+	}
+	githubSource := mcpx.NewGitHubSource(client, reference.Owner, reference.Repository,
+		reference.Ref, options.MaxFiles)
+	githubSource.ToolNames = resolvedToolNames
+
+	return githubSource, displayName, reference.Ref, closeClient, nil
+}
+
+// connectToGitHub starts the server subprocess and negotiates the protocol.
+func connectToGitHub(ctx context.Context, options sourceOptions) (
+	mcpx.RepositoryReference, *mcpx.Client, func(), error,
+) {
+	noop := func() {}
+
+	reference, err := mcpx.ParseRepositoryReference(options.GitHubTarget)
+	if err != nil {
+		return reference, nil, noop, fmt.Errorf("-github: %w", err)
 	}
 	// An explicit -ref wins over a branch carried in the URL, so a pasted link
 	// can still be redirected without editing it.
-	if githubRef != "" {
-		reference.Ref = githubRef
+	if options.Ref != "" {
+		reference.Ref = options.Ref
 	}
-	if mcpCommand == "" {
-		return nil, "", "", noop, errors.New(
+	if options.MCPCommand == "" {
+		return reference, nil, noop, errors.New(
 			"-github needs a GitHub MCP server to talk to. Set -mcp-command or GITHUB_MCP_COMMAND, " +
 				"for example: -mcp-command \"npx -y @modelcontextprotocol/server-github\". " +
 				"The server reads GITHUB_TOKEN for private repositories")
 	}
 
-	commandFields := strings.Fields(mcpCommand)
+	commandFields := strings.Fields(options.MCPCommand)
 	transport, err := mcpx.StartCommand(ctx, commandFields[0], commandFields[1:], nil)
 	if err != nil {
-		return nil, "", "", noop, err
+		return reference, nil, noop, fmt.Errorf("could not start the MCP server %q: %w", options.MCPCommand, err)
 	}
 	client := mcpx.NewClient("github", transport)
+	closeClient := func() { _ = client.Close() }
 
 	// Negotiate before doing anything else: under the stateless revision this
 	// is the only way to learn whether the server can talk to us at all.
 	if err := client.Discover(ctx); err != nil {
-		_ = client.Close()
-		return nil, "", "", noop, err
+		closeClient()
+		return reference, nil, noop, err
+	}
+	return reference, client, closeClient, nil
+}
+
+// checkMCPServer is the pre-flight diagnostic: connect, negotiate, list the
+// catalogue, and report which tools would be used. Rehearsing an integration
+// should not require running a whole pipeline.
+func checkMCPServer(ctx context.Context, options sourceOptions) error {
+	if options.GitHubTarget == "" {
+		return errors.New("-mcp-check needs -github naming the repository to check against")
 	}
 
-	displayName := repositoryName
-	if displayName == "" {
-		displayName = reference.Slug()
+	reference, client, closeClient, err := connectToGitHub(ctx, options)
+	if err != nil {
+		return err
 	}
-	githubSource := mcpx.NewGitHubSource(client, reference.Owner, reference.Repository, reference.Ref, maxFiles)
-	return githubSource, displayName, reference.Ref, func() { _ = client.Close() }, nil
+	defer closeClient()
+
+	fmt.Printf("connected     server responded to server/discover on protocol %s\n", mcpx.ProtocolVersion)
+	fmt.Printf("repository    %s", reference.Slug())
+	if reference.Ref != "" {
+		fmt.Printf(" @ %s", reference.Ref)
+	}
+	fmt.Println()
+
+	descriptors, err := client.ListTools(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("catalogue     %d tools\n", len(descriptors))
+	for _, descriptor := range descriptors {
+		fmt.Printf("              - %s\n", descriptor.Name)
+	}
+
+	resolvedToolNames, resolveErr := mcpx.ResolveToolNames(ctx, client)
+	if options.ToolOverrides.Tree != "" {
+		resolvedToolNames.Tree = options.ToolOverrides.Tree
+	}
+	if options.ToolOverrides.GetFile != "" {
+		resolvedToolNames.GetFile = options.ToolOverrides.GetFile
+	}
+	if resolvedToolNames.Tree == "" || resolvedToolNames.GetFile == "" {
+		return resolveErr
+	}
+	fmt.Printf("resolved      %s\n", resolvedToolNames.Describe())
+
+	// A live fetch is the only thing that proves credentials and arguments are
+	// right. Everything above can pass against a server that cannot see the repo.
+	githubSource := mcpx.NewGitHubSource(client, reference.Owner, reference.Repository,
+		reference.Ref, options.MaxFiles)
+	githubSource.ToolNames = resolvedToolNames
+
+	entries, err := githubSource.Tree(ctx)
+	if err != nil {
+		return fmt.Errorf("the tree fetch failed, so the pipeline would fail too: %w", err)
+	}
+	fmt.Printf("tree          %d files\n", len(entries))
+	if len(entries) > 0 {
+		content, err := githubSource.ReadFile(ctx, entries[0].Path)
+		if err != nil {
+			return fmt.Errorf("reading %s failed, so the pipeline would fail too: %w", entries[0].Path, err)
+		}
+		fmt.Printf("read          %s (%d bytes)\n", entries[0].Path, len(content))
+	}
+	fmt.Println("\nok — this server can drive the pipeline.")
+	return nil
 }
 
 // defaultMCPCommand lets the server be configured once in the environment
