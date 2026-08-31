@@ -5,6 +5,10 @@ document. Architecture doc: `claude/architecture.md` in the project.
 
 **Status: all seven phases implemented. 124 tests, `go vet` clean, zero dependencies.**
 
+Setup, troubleshooting and a level-by-level verification ladder:
+**[SETUP.md](SETUP.md)**. On Windows, `run-demo.bat` walks the same ladder and
+tells you which credentials are missing.
+
 ## Run it
 
 ```bash
